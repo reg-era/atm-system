@@ -1,0 +1,6 @@
+bin/
+data/*
+*.o
+*.a
+*.so
+*.exe

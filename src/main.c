@@ -96,9 +96,8 @@ void initMenu(struct User *u)
 
 int main()
 {
-    struct User u;
-    
+    struct User u;    
     initMenu(&u);
     mainMenu(u);
     return 0;
-}
+};

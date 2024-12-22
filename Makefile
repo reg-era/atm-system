@@ -1,16 +1,40 @@
-objects = src/main.o src/system.o src/auth.o
+# Compiler and flags
+CC = cc
+CFLAGS = -Wall -g -I./include  # Add include directory for header files
 
-atm : $(objects)
-	cc -o atm $(objects)
+# Directories
+SRC_DIR = src
+BIN_DIR = bin
+OBJ_DIR = bin/obj
+DATA_DIR = data
 
-main.o : src/header.h
-kbd.o : src/header.h
-command.o : src/header.h
-display.o : src/header.h
-insert.o : src/header.h
-search.o : src/header.h
-files.o : src/header.h
-utils.o : src/header.h
+# Files
+EXEC = atm
+OBJECTS = $(OBJ_DIR)/main.o $(OBJ_DIR)/system.o $(OBJ_DIR)/auth.o
 
-clean :
-	rm -f $(objects)
+# Targets
+
+# Default target
+all: $(BIN_DIR)/$(EXEC)
+
+# Linking the objects to create the final executable in the bin/ directory
+$(BIN_DIR)/$(EXEC): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@
+
+# Compile .c files into .o object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Run the program
+run: all
+	./$(BIN_DIR)/$(EXEC)
+
+# Clean up the build
+clean:
+	rm -f $(OBJ_DIR)/*.o $(BIN_DIR)/$(EXEC)
+
+# Rebuild the project
+rebuild: clean all
+
+# Prevent make from getting confused by files named 'clean', 'all', etc.
+.PHONY: all clean run rebuild
