@@ -1,40 +1,28 @@
-# Compiler and flags
-CC = cc
-CFLAGS = -Wall -g -I./include  # Add include directory for header files
+CC = gcc
+CFLAGS = -Wall -g -I./include
 
-# Directories
 SRC_DIR = src
 BIN_DIR = bin
-OBJ_DIR = bin/obj
-DATA_DIR = data
-
-# Files
 EXEC = atm
-OBJECTS = $(OBJ_DIR)/main.o $(OBJ_DIR)/system.o $(OBJ_DIR)/auth.o
 
-# Targets
+SOURCES = $(wildcard $(SRC_DIR)/*.c)
 
-# Default target
-all: $(BIN_DIR)/$(EXEC)
+OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(BIN_DIR)/%.o)
 
-# Linking the objects to create the final executable in the bin/ directory
+build: clean $(BIN_DIR)/$(EXEC)
+
 $(BIN_DIR)/$(EXEC): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
+	$(CC) $^ -o $@ -lsqlite3
 
-# Compile .c files into .o object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Run the program
-run: all
+run: build
 	./$(BIN_DIR)/$(EXEC)
 
-# Clean up the build
 clean:
-	rm -f $(OBJ_DIR)/*.o $(BIN_DIR)/$(EXEC)
+	rm -rf $(BIN_DIR)/*
 
-# Rebuild the project
-rebuild: clean all
+all: clean build run
 
-# Prevent make from getting confused by files named 'clean', 'all', etc.
-.PHONY: all clean run rebuild
+.PHONY: build run clean

@@ -1,6 +1,2 @@
-bin/
-data/*
-*.o
-*.a
-*.so
-*.exe
+bin/*
+!bin/

@@ -1,4 +1,5 @@
 #include "header.h"
+#include <sqlite3.h>
 
 void mainMenu(struct User u)
 {
@@ -94,10 +95,17 @@ void initMenu(struct User *u)
     }
 };
 
+// struct User u;
+// initMenu(&u);
+// mainMenu(u);
+
 int main()
 {
-    struct User u;    
-    initMenu(&u);
-    mainMenu(u);
+    sqlite3 *db = NULL;
+    if (initDatabase("./data/data.db", &db))
+    {
+        return 1;
+    }
+    sqlite3_close(db);
     return 0;
 };
