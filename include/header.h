@@ -32,11 +32,14 @@ struct User
     char name[50];
     char password[50];
 };
+// database function
+int addUserDB(struct User *u,sqlite3 *db);
+int loginUserDB(struct User *user, sqlite3 *db, const char *password);
+
 
 // authentication functions
-void loginMenu(char a[50], char pass[50]);
-void registerMenu(char a[50], char pass[50]);
-const char *getPassword(struct User u);
+int loginMenu(struct User *user, sqlite3 *db);
+int registerMenu(struct User *user);
 
 // system function
 void createNewAcc(struct User u);

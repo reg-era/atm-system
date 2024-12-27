@@ -53,51 +53,74 @@ void mainMenu(struct User u)
     }
 };
 
-void initMenu(struct User *u)
+void initMenu(struct User *user, sqlite3 *db)
 {
-    int r = 0;
-    int option;
     system("clear");
-    printf("\n\n\t\t======= ATM =======\n");
-    printf("\n\t\t-->> Feel free to login / register :\n");
-    printf("\n\t\t[1]- login\n");
-    printf("\n\t\t[2]- register\n");
-    printf("\n\t\t[3]- exit\n");
-    while (!r)
+    int retry = 1;
+    while (retry)
     {
-        scanf("%d", &option);
+        printf("\n\n\t\t======= ATM =======\n");
+        printf("\n\t\t-->> Feel free to login / register :\n");
+        printf("\n\t\t[1]- login\n");
+        printf("\n\t\t[2]- register\n");
+        printf("\n\t\t[3]- exit\n");
+        int option;
+
+        if (scanf("%d", &option) != 1)
+        {
+            system("clear");
+            printf("Invalid option! Please choose a valid operation.\n");
+            while (getchar() != '\n')
+                ;
+            continue;
+        }
+
         switch (option)
         {
         case 1:
-            loginMenu(u->name, u->password);
-            if (strcmp(u->password, getPassword(*u)) == 0)
+            int err = loginMenu(user, db);
+            if (err)
             {
-                printf("\n\nPassword Match!");
+                system("clear");
+                printf("\nWrong password or User Name.\n");
+                retry = 1;
+                continue;
             }
-            else
-            {
-                printf("\nWrong password!! or User Name\n");
-                exit(1);
-            }
-            r = 1;
+            retry = 0;
             break;
+
         case 2:
-            // student TODO : add your **Registration** function
-            // here
-            r = 1;
-            break;
+        {
+            int err = registerMenu(user);
+            if (err)
+            {
+                system("clear");
+                printf("Failed during registration. Try again.\n");
+                retry = 1;
+                continue;
+            }
+            err = addUserDB(user, db);
+            if (err)
+            {
+                system("clear");
+                printf("Failed to register user:\n%s\nTry again.\n", sqlite3_errmsg(db));
+                retry = 1;
+                continue;
+            }
+            retry = 0;
+        }
+        break;
+
         case 3:
-            exit(1);
-            break;
+            exit(0);
+
         default:
-            printf("Insert a valid operation!\n");
+            system("clear");
+            printf("Invalid option! Please choose a valid operation.\n");
+            retry = 1;
         }
     }
-};
-
-// struct User u;
-// initMenu(&u);
-// mainMenu(u);
+}
 
 int main()
 {
@@ -106,6 +129,11 @@ int main()
     {
         return 1;
     }
+
+    struct User u;
+    initMenu(&u, db);
+    mainMenu(u);
+
     sqlite3_close(db);
     return 0;
 };

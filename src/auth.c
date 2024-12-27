@@ -1,17 +1,13 @@
 #include <termios.h>
 #include "header.h"
 
-char *USERS = "./data/users.txt";
-
-void loginMenu(char a[50], char pass[50])
+int registerMenu(struct User *user)
 {
     struct termios oflags, nflags;
-
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
-    scanf("%s", a);
 
-    // disabling echo
+    scanf("%s", user->name);
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
     nflags.c_lflag &= ~ECHO;
@@ -20,40 +16,58 @@ void loginMenu(char a[50], char pass[50])
     if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0)
     {
         perror("tcsetattr");
-        return exit(1);
+        return 1;
     }
-    printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
-    scanf("%s", pass);
 
-    // restore terminal
+    printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
+    scanf("%s", user->password);
+
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
         perror("tcsetattr");
-        return exit(1);
+        return 1;
     }
-};
+    return 0;
+}
 
-const char *getPassword(struct User u)
+int loginMenu(struct User *user, sqlite3 *db)
 {
-    FILE *fp;
-    struct User userChecker;
+    struct termios oflags, nflags;
 
-    if ((fp = fopen("./data/users.txt", "r")) == NULL)
+    system("clear");
+    printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:\n");
+
+    printf("\t\t\t\tUsername: ");
+    scanf("%s", user->name);
+
+    tcgetattr(fileno(stdin), &oflags);
+    nflags = oflags;
+    nflags.c_lflag &= ~ECHO; 
+    nflags.c_lflag |= ECHONL;
+    if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0)
     {
-        printf("Error! opening file");
-        exit(1);
+        perror("tcsetattr");
+        return 1;
     }
 
-    while (fscanf(fp, "%s %s", userChecker.name, userChecker.password) != EOF)
+    char password[100]; 
+    printf("\n\n\n\n\n\t\t\t\tEnter the password to login: ");
+    scanf("%s", password);
+
+    if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
-        if (strcmp(userChecker.name, u.name) == 0)
-        {
-            fclose(fp);
-            char *buff = userChecker.password;
-            return buff;
-        }
+        perror("tcsetattr");
+        return 1;
     }
 
-    fclose(fp);
-    return "no user found";
+    if (loginUserDB(user, db, password))
+    {
+        printf("\nInvalid username or password.\n");
+        return 1;
+    }
+    else
+    {
+        printf("\nLogin successful!\n");
+        return 0;
+    }
 }

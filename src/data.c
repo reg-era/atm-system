@@ -1,5 +1,6 @@
 #include <sqlite3.h>
 #include <stdio.h>
+#include "header.h"
 
 const char *_create_users_table =
     "CREATE TABLE IF NOT EXISTS users ("
@@ -57,4 +58,64 @@ int initDatabase(const char *url, sqlite3 **db)
     }
 
     return 0;
+}
+
+int addUserDB(struct User *user, sqlite3 *db)
+{
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, "INSERT INTO users (username, password) VALUES (?, ?)", -1, &stmt, 0) != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+
+    sqlite3_bind_text(stmt, 1, user->name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, user->password, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+
+    user->id = sqlite3_last_insert_rowid(db);
+
+    sqlite3_finalize(stmt);
+    return 0;
+}
+
+int loginUserDB(struct User *user, sqlite3 *db, const char *password)
+{
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(db, "SELECT id, username, password FROM users WHERE username = ?", -1, &stmt, 0) != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+
+    sqlite3_bind_text(stmt, 1, user->name, -1, SQLITE_STATIC);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        user->id = sqlite3_column_int(stmt, 0);
+        const char *usernameDB = (const char *)sqlite3_column_text(stmt, 1);
+        const char *passwordDB = (const char *)sqlite3_column_text(stmt, 2);
+
+        if (usernameDB == NULL || strcmp(usernameDB, user->name) == 1 ||
+            passwordDB == NULL || strcmp(passwordDB, password) == 1)
+        {
+            sqlite3_finalize(stmt);
+            return 1;
+        }
+        else if (strcmp(usernameDB, user->name) == 0 && strcmp(passwordDB, password) == 0)
+        {
+            strcpy(user->password, password);
+            sqlite3_finalize(stmt);
+            return 0;
+        }
+    }
+    sqlite3_finalize(stmt);
+    return 1;
 }
