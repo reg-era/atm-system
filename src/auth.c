@@ -42,7 +42,7 @@ int loginMenu(struct User *user, sqlite3 *db)
 
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
-    nflags.c_lflag &= ~ECHO; 
+    nflags.c_lflag &= ~ECHO;
     nflags.c_lflag |= ECHONL;
     if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0)
     {
@@ -50,7 +50,7 @@ int loginMenu(struct User *user, sqlite3 *db)
         return 1;
     }
 
-    char password[100]; 
+    char password[100];
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login: ");
     scanf("%s", password);
 
@@ -60,14 +60,5 @@ int loginMenu(struct User *user, sqlite3 *db)
         return 1;
     }
 
-    if (loginUserDB(user, db, password))
-    {
-        printf("\nInvalid username or password.\n");
-        return 1;
-    }
-    else
-    {
-        printf("\nLogin successful!\n");
-        return 0;
-    }
+    return loginUserDB(user, db, password);
 }

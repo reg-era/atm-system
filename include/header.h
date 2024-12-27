@@ -12,7 +12,7 @@ struct Date
 };
 
 // all fields for each record of an account
-struct Record
+struct Account
 {
     int id;
     int userId;
@@ -33,9 +33,8 @@ struct User
     char password[50];
 };
 // database function
-int addUserDB(struct User *u,sqlite3 *db);
+int addUserDB(struct User *u, sqlite3 *db);
 int loginUserDB(struct User *user, sqlite3 *db, const char *password);
-
 
 // authentication functions
 int loginMenu(struct User *user, sqlite3 *db);
@@ -43,12 +42,12 @@ int registerMenu(struct User *user);
 
 // system function
 void createNewAcc(struct User u);
-void mainMenu(struct User u);
+void mainMenu(struct User u, sqlite3 *db);
 void checkAllAccounts(struct User u);
 
 // utilitis function
 int validName(char *name);
-int validNumber(char *number); 
+int validNumber(char *number);
 int initDatabase(const char *url, sqlite3 **db);
 
 #endif

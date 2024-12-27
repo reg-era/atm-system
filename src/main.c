@@ -1,57 +1,70 @@
 #include "header.h"
 #include <sqlite3.h>
 
-void mainMenu(struct User u)
+void mainMenu(struct User user, sqlite3 *db)
 {
-    int option;
     system("clear");
-    printf("\n\n\t\t======= ATM =======\n\n");
-    printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
-    printf("\n\t\t[1]- Create a new account\n");
-    printf("\n\t\t[2]- Update account information\n");
-    printf("\n\t\t[3]- Check accounts\n");
-    printf("\n\t\t[4]- Check list of owned account\n");
-    printf("\n\t\t[5]- Make Transaction\n");
-    printf("\n\t\t[6]- Remove existing account\n");
-    printf("\n\t\t[7]- Transfer ownership\n");
-    printf("\n\t\t[8]- Exit\n");
-    scanf("%d", &option);
-
-    switch (option)
+    int retry = 1;
+    while (retry)
     {
-    case 1:
-        createNewAcc(u);
-        break;
-    case 2:
-        // student TODO : add your **Update account information** function
-        // here
-        break;
-    case 3:
-        // student TODO : add your **Check the details of existing accounts** function
-        // here
-        break;
-    case 4:
-        checkAllAccounts(u);
-        break;
-    case 5:
-        // student TODO : add your **Make transaction** function
-        // here
-        break;
-    case 6:
-        // student TODO : add your **Remove existing account** function
-        // here
-        break;
-    case 7:
-        // student TODO : add your **Transfer owner** function
-        // here
-        break;
-    case 8:
-        exit(1);
-        break;
-    default:
-        printf("Invalid operation!\n");
+        printf("\n\n\t\t======= ATM =======\n\n");
+        printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
+        printf("\n\t\t[1]- Create a new account\n");
+        printf("\n\t\t[2]- Update account information\n");
+        printf("\n\t\t[3]- Check accounts\n");
+        printf("\n\t\t[4]- Check list of owned account\n");
+        printf("\n\t\t[5]- Make Transaction\n");
+        printf("\n\t\t[6]- Remove existing account\n");
+        printf("\n\t\t[7]- Transfer ownership\n");
+        printf("\n\t\t[8]- Exit\n");
+        int option;
+
+        if (scanf("%d", &option) != 1)
+        {
+            system("clear");
+            printf("Invalid option! Please choose a valid operation.\n");
+            while (getchar() != '\n')
+                ;
+            continue;
+        }
+
+        switch (option)
+        {
+        case 1:
+            createNewAcc(user);
+            break;
+        case 2:
+            // student TODO : add your **Update account information** function
+            // here
+            break;
+        case 3:
+            // student TODO : add your **Check the details of existing accounts** function
+            // here
+            break;
+        case 4:
+            checkAllAccounts(user);
+            break;
+        case 5:
+            // student TODO : add your **Make transaction** function
+            // here
+            break;
+        case 6:
+            // student TODO : add your **Remove existing account** function
+            // here
+            break;
+        case 7:
+            // student TODO : add your **Transfer owner** function
+            // here
+            break;
+        case 8:
+            system("clear");
+            return;
+        default:
+            system("clear");
+            printf("Invalid operation!\n");
+        }
     }
-};
+}
 
 void initMenu(struct User *user, sqlite3 *db)
 {
@@ -78,8 +91,7 @@ void initMenu(struct User *user, sqlite3 *db)
         switch (option)
         {
         case 1:
-            int err = loginMenu(user, db);
-            if (err)
+            if (loginMenu(user, db))
             {
                 system("clear");
                 printf("\nWrong password or User Name.\n");
@@ -91,16 +103,14 @@ void initMenu(struct User *user, sqlite3 *db)
 
         case 2:
         {
-            int err = registerMenu(user);
-            if (err)
+            if (registerMenu(user))
             {
                 system("clear");
                 printf("Failed during registration. Try again.\n");
                 retry = 1;
                 continue;
             }
-            err = addUserDB(user, db);
-            if (err)
+            if (addUserDB(user, db))
             {
                 system("clear");
                 printf("Failed to register user:\n%s\nTry again.\n", sqlite3_errmsg(db));
@@ -112,8 +122,8 @@ void initMenu(struct User *user, sqlite3 *db)
         break;
 
         case 3:
-            exit(0);
-
+            system("clear");
+            return;
         default:
             system("clear");
             printf("Invalid option! Please choose a valid operation.\n");
@@ -132,7 +142,7 @@ int main()
 
     struct User u;
     initMenu(&u, db);
-    mainMenu(u);
+    mainMenu(u, db);
 
     sqlite3_close(db);
     return 0;
