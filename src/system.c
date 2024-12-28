@@ -13,7 +13,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         if (option == 0)
             f(u);
         // else if (option == 1)
-            // mainMenu(u);
+        // mainMenu(u);
         else if (option == 2)
             exit(0);
         else
@@ -62,37 +62,72 @@ invalid:
     }
 }
 
-void createNewAcc(struct User u)
+void createNewAcc(struct User u, sqlite3 *db)
 {
     struct Account acc;
 
-noAccount:
     system("clear");
     printf("\t\t\t===== New record =====\n");
 
-    printf("\nEnter today's date(mm/dd/yyyy):");
-    scanf("%d/%d/%d", &acc.deposit.month, &acc.deposit.day, &acc.deposit.year);
-    printf("\nEnter the account number:");
-    scanf("%d", &acc.accountNbr);
-
-    while (0)
+    while (1)
     {
-        if (0)
-        {
-            printf("✖ This Account already exists for this user\n\n");
-            goto noAccount;
-        }
+        printf("\nEnter today's date (mm/dd/yyyy): ");
+        if (scanf("%d/%d/%d", &acc.deposit.month, &acc.deposit.day, &acc.deposit.year) == 3 && validDate(acc.deposit.month, acc.deposit.day, acc.deposit.year))
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid date");
     }
-    printf("\nEnter the country:");
-    scanf("%s", acc.country);
-    printf("\nEnter the phone number:");
-    scanf("%d", &acc.phone);
-    printf("\nEnter amount to deposit: $");
-    scanf("%lf", &acc.amount);
-    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    scanf("%s",acc.accountType);
 
-    success(u);
+    while (1)
+    {
+        printf("\nEnter the account number: ");
+        if (scanf("%d", &acc.accountNbr) == 1 && validAccountNumber(acc.accountNbr))
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid number");
+    }
+
+    while (1)
+    {
+        printf("\nEnter the country: ");
+        if (scanf("%s", acc.country) == 1 && strlen(acc.country) != 0)
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid country name");
+    }
+
+    while (1)
+    {
+        printf("\nEnter the phone number (10 digits): ");
+        if (scanf("%d", &acc.phone) == 1 && validPhone(acc.phone))
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid phone number");
+    }
+
+    while (1)
+    {
+        printf("\nEnter amount to deposit: $");
+        if (scanf("%lf", &acc.amount) == 1 && acc.amount > 0)
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid deposit amount");
+    }
+
+    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n");
+    while (1)
+    {
+        printf(" Enter your choice: ");
+        if (scanf("%s", acc.accountType) == 1 && validAccountType(acc.accountType))
+            break;
+        clearInputBuffer();
+        printf("✖ Invalid account type");
+    }
+
+    if (addAccountDB(u.id,&acc, db))
+    {
+        success(u);
+    }
 }
 
 void checkAllAccounts(struct User u)

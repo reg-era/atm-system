@@ -119,3 +119,37 @@ int loginUserDB(struct User *user, sqlite3 *db, const char *password)
     sqlite3_finalize(stmt);
     return 1;
 }
+
+int addAccountDB(int userID, struct Account *acc, sqlite3 *db)
+{
+    sqlite3_stmt *stmt;
+
+    const char *sql = "INSERT INTO accounts (created_at, account_number, account_type, country, phone, balance, user_id) "
+                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+
+    char created_at[11];
+    snprintf(created_at, sizeof(created_at), "%02d/%02d/%04d", acc->deposit.day, acc->deposit.month, acc->deposit.year);
+
+    sqlite3_bind_text(stmt, 1, created_at, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, acc->accountNbr);
+    sqlite3_bind_text(stmt, 3, acc->accountType, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, acc->country, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 5, acc->phone);
+    sqlite3_bind_double(stmt, 6, acc->amount);
+    sqlite3_bind_int(stmt, 7, userID);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+
+    sqlite3_finalize(stmt);
+    return 0;
+}

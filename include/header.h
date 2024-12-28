@@ -33,21 +33,25 @@ struct User
     char password[50];
 };
 // database function
+int initDatabase(const char *url, sqlite3 **db);
 int addUserDB(struct User *u, sqlite3 *db);
 int loginUserDB(struct User *user, sqlite3 *db, const char *password);
+int addAccountDB(int userID,struct Account *acc, sqlite3 *db);
 
 // authentication functions
 int loginMenu(struct User *user, sqlite3 *db);
 int registerMenu(struct User *user);
 
 // system function
-void createNewAcc(struct User u);
+void createNewAcc(struct User u, sqlite3 *db);
 void mainMenu(struct User u, sqlite3 *db);
 void checkAllAccounts(struct User u);
 
 // utilitis function
-int validName(char *name);
-int validNumber(char *number);
-int initDatabase(const char *url, sqlite3 **db);
+void clearInputBuffer();
+int validPhone(int phone);
+int validAccountType(char *accountType);
+int validDate(int month, int day, int year);
+int validAccountNumber(int accountNbr);
 
 #endif

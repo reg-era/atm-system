@@ -31,7 +31,7 @@ void mainMenu(struct User user, sqlite3 *db)
         switch (option)
         {
         case 1:
-            createNewAcc(user);
+            createNewAcc(user, db);
             break;
         case 2:
             // student TODO : add your **Update account information** function
