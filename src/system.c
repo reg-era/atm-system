@@ -20,7 +20,7 @@ void createNewAcc(User u, sqlite3 *db)
     while (1)
     {
         printf("\nEnter the account number: ");
-        if (scanf("%d", &acc.accountNbr) == 1 && validAccountNumber(acc.accountNbr))
+        if (scanf("%d", &acc.accountNbr) == 1 && acc.accountNbr > 0)
             break;
         clearInputBuffer();
         printf("✖ Invalid number");
@@ -38,7 +38,7 @@ void createNewAcc(User u, sqlite3 *db)
     while (1)
     {
         printf("\nEnter the phone number (10 digits): ");
-        if (scanf("%d", &acc.phone) == 1 && validPhone(acc.phone))
+        if (scanf("%d", &acc.phone) == 1 && acc.phone > 0 && acc.phone <= 9999999999)
             break;
         clearInputBuffer();
         printf("✖ Invalid phone number");

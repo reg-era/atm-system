@@ -2,13 +2,11 @@
 #include <stdio.h>
 #include "header.h"
 
-const char *_create_users_table =
+const char *_create_tables =
     "CREATE TABLE IF NOT EXISTS users ("
     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
     "username TEXT NOT NULL UNIQUE, "
-    "password TEXT NOT NULL);";
-
-const char *_create_accounts_table =
+    "password TEXT NOT NULL); "
     "CREATE TABLE IF NOT EXISTS accounts ("
     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
     "created_at TEXT NOT NULL, "
@@ -23,13 +21,13 @@ const char *_create_accounts_table =
     "UNIQUE(account_number, user_id) "
     ");";
 
-int initDatabase(const char *url, sqlite3 **db)
+void initDatabase(const char *url, sqlite3 **db)
 {
     int err = sqlite3_open(url, db);
     if (err)
     {
         printf("Database can't open:\nError message: %s\n", sqlite3_errmsg(*db));
-        return 1;
+        exit(1);
     }
 
     char *err_msg = 0;
@@ -39,26 +37,16 @@ int initDatabase(const char *url, sqlite3 **db)
     {
         printf("SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
-        return 1;
+        exit(1);
     }
 
-    status = sqlite3_exec(*db, _create_users_table, 0, 0, &err_msg);
+    status = sqlite3_exec(*db, _create_tables, 0, 0, &err_msg);
     if (status != SQLITE_OK)
     {
         printf("SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
-        return 1;
+        exit(1);
     }
-
-    status = sqlite3_exec(*db, _create_accounts_table, 0, 0, &err_msg);
-    if (status != SQLITE_OK)
-    {
-        printf("SQL error: %s\n", err_msg);
-        sqlite3_free(err_msg);
-        return 1;
-    }
-
-    return 0;
 }
 
 int addUserDB(User *user, sqlite3 *db)
@@ -81,7 +69,6 @@ int addUserDB(User *user, sqlite3 *db)
     }
 
     user->id = sqlite3_last_insert_rowid(db);
-
     sqlite3_finalize(stmt);
     return 0;
 }
@@ -89,7 +76,6 @@ int addUserDB(User *user, sqlite3 *db)
 int loginUserDB(User *user, sqlite3 *db, const char *password)
 {
     sqlite3_stmt *stmt;
-
     if (sqlite3_prepare_v2(db, "SELECT id, username, password FROM users WHERE username = ?", -1, &stmt, 0) != SQLITE_OK)
     {
         sqlite3_finalize(stmt);
@@ -253,7 +239,7 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
         if (option == 1)
         {
             int phone;
-            if (scanf("%d", &phone) == 1 && validPhone(phone))
+            if (scanf("%d", &phone) == 1 && phone > 0 && phone <= 9999999999)
             {
                 sqlite3_bind_int(stmt, 1, phone);
                 break;

@@ -4,25 +4,24 @@
 void mainMenu(User user, sqlite3 *db)
 {
     system("clear");
-    int retry = 1;
-    while (retry)
+    while (1)
     {
         printf("\n\n\t\t======= ATM =======\n\n");
-        printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
+        printf("\n\t\t-->> Choose an option:\n");
         printf("\n\t\t[1]- Create a new account\n");
         printf("\n\t\t[2]- Update account information\n");
         printf("\n\t\t[3]- Check accounts\n");
-        printf("\n\t\t[4]- Check list of owned account\n");
+        printf("\n\t\t[4]- List owned accounts\n");
         printf("\n\t\t[5]- Make Transaction\n");
-        printf("\n\t\t[6]- Remove existing account\n");
+        printf("\n\t\t[6]- Remove account\n");
         printf("\n\t\t[7]- Transfer ownership\n");
         printf("\n\t\t[8]- Exit\n");
-        int option;
 
+        int option;
         if (scanf("%d", &option) != 1)
         {
             system("clear");
-            printf("Invalid option! Please choose a valid operation.\n");
+            printf("Invalid input!\n");
             clearInputBuffer();
             continue;
         }
@@ -32,119 +31,123 @@ void mainMenu(User user, sqlite3 *db)
         case 1:
             createNewAcc(user, db);
             break;
+
         case 2:
-            printf("What is the account number you want to change: ");
-            while (1)
+        {
+            int accNB;
+            printf("Enter the account number to update: ");
+            if (scanf("%d", &accNB) != 1)
             {
-                int accNB;
-                if (scanf("%d", &accNB) == 1)
-                {
-                    printf("Wich information do you want to update?\n1 --> phone number\n2 --> county\n");
-                    while (1)
-                    {
-                        int upOption;
-                        if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
-                        {
-                            updatUserAcc(upOption, user, db, accNB);
-                            break;
-                        }
-                        printf("Invalid option! try again : ");
-                        clearInputBuffer();
-                        continue;
-                    }
-                    break;
-                }
-                printf("Invalid option! Please enter account number: ");
+                printf("Invalid account number!\n");
                 clearInputBuffer();
-                continue;
+                break;
             }
-            break;
-        case 3:
-            printf("Enter account number: ");
-            while (1)
+
+            printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
+            int upOption;
+            if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
             {
-                int accNB;
-                if (scanf("%d", &accNB) == 1)
-                {
-                    checkAcount(user, db, accNB);
-                    system("clean");
-                    break;
-                }
-                else
-                {
-                    printf("Invalid option! Please enter account number: ");
-                    clearInputBuffer();
-                    continue;
-                }
+                updatUserAcc(upOption, user, db, accNB);
+            }
+            else
+            {
+                printf("Invalid option!\n");
+                clearInputBuffer();
             }
             break;
+        }
+
+        case 3:
+        {
+            int accNB;
+            printf("Enter account number: ");
+            if (scanf("%d", &accNB) == 1)
+            {
+                checkAcount(user, db, accNB);
+            }
+            else
+            {
+                printf("Invalid account number!\n");
+                clearInputBuffer();
+            }
+            break;
+        }
+
         case 4:
             checkAllAccounts(user, db);
             break;
+
         case 5:
-            printf("Enter the account number of the customer: ");
-            while (1)
-            {
-                int accNB;
-                if (scanf("%d", &accNB) == 1)
-                {
-                    printf("Do you want to:\n\t1 --> Withdraw\n\t2 --> Deposit\n\nEnter your choice: ");
-                    while (1)
-                    {
-                        int upOption;
-                        if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
-                        {
-                            makeTransaction(upOption, user, db, accNB);
-                            break;
-                        }
-                        printf("Invalid option! try again : ");
-                        clearInputBuffer();
-                        continue;
-                    }
-                    break;
-                }
-                printf("Invalid option! Please enter account number: ");
-                clearInputBuffer();
-                continue;
-            }
-            break;
-        case 6:
-            printf("Enter account number: ");
-            while (1)
-            {
-                int accNB;
-                if (scanf("%d", &accNB) == 1)
-                {
-                    system("clean");
-                    printf("Are you sure you want to remove the %d account\nType [yes] to confirm: ", accNB);
-                    char decision[3];
-                    if (scanf("%3s", decision) == 1 && strcmp(decision, "yes") == 0)
-                        deletAccount(user, db, accNB);
-                    break;
-                    printf("Failed to remove the %d account", accNB);
-                }
-                printf("Invalid option! Please enter account number: ");
-                clearInputBuffer();
-            }
-            break;
-        case 7:
-            printf("Enter the account number you want to transfere ownership: ");
+        {
             int accNB;
+            printf("Enter account number: ");
+            if (scanf("%d", &accNB) == 1)
+            {
+                printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
+                int transOption;
+                if (scanf("%d", &transOption) == 1 && (transOption == 1 || transOption == 2))
+                {
+                    makeTransaction(transOption, user, db, accNB);
+                }
+                else
+                {
+                    printf("Invalid transaction option!\n");
+                    clearInputBuffer();
+                }
+            }
+            else
+            {
+                printf("Invalid account number!\n");
+                clearInputBuffer();
+            }
+            break;
+        }
+
+        case 6:
+        {
+            int accNB;
+            printf("Enter account number: ");
+            if (scanf("%d", &accNB) == 1)
+            {
+                char decision[4];
+                printf("Confirm deletion (yes): ");
+                if (scanf("%3s", decision) == 1 && strcmp(decision, "yes") == 0)
+                {
+                    deletAccount(user, db, accNB);
+                }
+            }
+            else
+            {
+                printf("Invalid account number!\n");
+                clearInputBuffer();
+            }
+            break;
+        }
+
+        case 7:
+        {
+            int accNB;
+            printf("Enter account number to transfer ownership: ");
             if (scanf("%d", &accNB) == 1)
             {
                 transferAccount(user, db, accNB);
-                break;
             }
-            printf("Invalid option! Please retry: ");
-            clearInputBuffer();
+            else
+            {
+                printf("Invalid account number!\n");
+                clearInputBuffer();
+            }
             break;
+        }
+
         case 8:
             system("clear");
             sqlite3_close(db);
             exit(0);
+
         default:
             system("clear");
-            printf("Invalid operation!\n");
+            printf("Invalid option!\n");
         }
     }
 }
@@ -152,20 +155,19 @@ void mainMenu(User user, sqlite3 *db)
 void initMenu(User *user, sqlite3 *db)
 {
     system("clear");
-    int retry = 1;
-    while (retry)
+    while (1)
     {
         printf("\n\n\t\t======= ATM =======\n");
-        printf("\n\t\t-->> Feel free to login / register :\n");
-        printf("\n\t\t[1]- login\n");
-        printf("\n\t\t[2]- register\n");
-        printf("\n\t\t[3]- exit\n");
-        int option;
+        printf("\n\t\t-->> Login/Register:\n");
+        printf("\n\t\t[1]- Login\n");
+        printf("\n\t\t[2]- Register\n");
+        printf("\n\t\t[3]- Exit\n");
 
+        int option;
         if (scanf("%d", &option) != 1)
         {
             system("clear");
-            printf("Invalid option! Please choose a valid operation.\n");
+            printf("Invalid input!\n");
             clearInputBuffer();
             continue;
         }
@@ -173,43 +175,27 @@ void initMenu(User *user, sqlite3 *db)
         switch (option)
         {
         case 1:
-            if (loginMenu(user, db))
-            {
-                system("clear");
-                printf("\nWrong password or User Name.\n");
-                retry = 1;
-                continue;
-            }
-            retry = 0;
+            if (!loginMenu(user, db))
+                return;
+            system("clear");
+            printf("✖ Wrong username or password!");
             break;
 
         case 2:
-        {
-            if (registerMenu(user))
-            {
-                system("clear");
-                printf("Failed during registration. Try again.\n");
-                retry = 1;
-                continue;
-            }
-            if (addUserDB(user, db))
-            {
-                system("clear");
-                printf("Failed to register user:\n%s\nTry again.\n", sqlite3_errmsg(db));
-                retry = 1;
-                continue;
-            }
-            retry = 0;
-        }
-        break;
+            if (!registerMenu(user) && !addUserDB(user, db))
+                return;
+            system("clear");
+            printf("✖ Registration failed try again!");
+            break;
 
         case 3:
             system("clear");
-            return;
+            sqlite3_close(db);
+            exit(0);
+
         default:
             system("clear");
-            printf("Invalid option! Please choose a valid operation.\n");
-            retry = 1;
+            printf("✖ Invalid option!");
         }
     }
 }
@@ -217,14 +203,11 @@ void initMenu(User *user, sqlite3 *db)
 int main()
 {
     sqlite3 *db = NULL;
-    if (initDatabase("./data/data.db", &db))
-    {
-        return 1;
-    }
+    initDatabase("./data/data.db", &db);
 
-    User u;
-    initMenu(&u, db);
-    mainMenu(u, db);
+    User user;
+    initMenu(&user, db);
+    mainMenu(user, db);
 
     return 0;
-};
+}

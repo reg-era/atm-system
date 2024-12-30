@@ -32,7 +32,7 @@ typedef struct
 } User;
 
 // database function
-int initDatabase(const char *url, sqlite3 **db);
+void initDatabase(const char *url, sqlite3 **db);
 int addUserDB(User *u, sqlite3 *db);
 int loginUserDB(User *user, sqlite3 *db, const char *password);
 int addAccountDB(int userID, Account *acc, sqlite3 *db);
@@ -58,9 +58,7 @@ void success(User u, sqlite3 *db);
 void stayOrReturn(void f(User u, sqlite3 *db), User u, sqlite3 *db);
 
 void clearInputBuffer();
-int validPhone(int phone);
 int validAccountType(char *accountType);
 int validDate(int month, int day, int year);
-int validAccountNumber(int accountNbr);
 
 #endif

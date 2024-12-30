@@ -58,11 +58,6 @@ void clearInputBuffer()
         ;
 }
 
-int validPhone(int phone)
-{
-    return phone > 0 && phone <= 9999999999;
-}
-
 int validAccountType(char *accountType)
 {
     return (strcmp(accountType, "saving") == 0 ||
@@ -96,9 +91,4 @@ int validDate(int day, int month, int year)
         }
     }
     return 1;
-}
-
-int validAccountNumber(int accountNbr)
-{
-    return accountNbr > 0;
 }
