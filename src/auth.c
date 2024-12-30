@@ -1,7 +1,7 @@
 #include <termios.h>
 #include "header.h"
 
-int registerMenu(struct User *user)
+int registerMenu(User *user)
 {
     struct termios oflags, nflags;
     system("clear");
@@ -30,7 +30,7 @@ int registerMenu(struct User *user)
     return 0;
 }
 
-int loginMenu(struct User *user, sqlite3 *db)
+int loginMenu(User *user, sqlite3 *db)
 {
     struct termios oflags, nflags;
 

@@ -1,7 +1,7 @@
 #include "header.h"
 #include <sqlite3.h>
 
-void mainMenu(struct User user, sqlite3 *db)
+void mainMenu(User user, sqlite3 *db)
 {
     system("clear");
     int retry = 1;
@@ -23,8 +23,7 @@ void mainMenu(struct User user, sqlite3 *db)
         {
             system("clear");
             printf("Invalid option! Please choose a valid operation.\n");
-            while (getchar() != '\n')
-                ;
+            clearInputBuffer();
             continue;
         }
 
@@ -34,31 +33,115 @@ void mainMenu(struct User user, sqlite3 *db)
             createNewAcc(user, db);
             break;
         case 2:
-            // student TODO : add your **Update account information** function
-            // here
+            printf("What is the account number you want to change: ");
+            while (1)
+            {
+                int accNB;
+                if (scanf("%d", &accNB) == 1)
+                {
+                    printf("Wich information do you want to update?\n1 --> phone number\n2 --> county\n");
+                    while (1)
+                    {
+                        int upOption;
+                        if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
+                        {
+                            updatUserAcc(upOption, user, db, accNB);
+                            break;
+                        }
+                        printf("Invalid option! try again : ");
+                        clearInputBuffer();
+                        continue;
+                    }
+                    break;
+                }
+                printf("Invalid option! Please enter account number: ");
+                clearInputBuffer();
+                continue;
+            }
             break;
         case 3:
-            // student TODO : add your **Check the details of existing accounts** function
-            // here
+            printf("Enter account number: ");
+            while (1)
+            {
+                int accNB;
+                if (scanf("%d", &accNB) == 1)
+                {
+                    checkAcount(user, db, accNB);
+                    system("clean");
+                    break;
+                }
+                else
+                {
+                    printf("Invalid option! Please enter account number: ");
+                    clearInputBuffer();
+                    continue;
+                }
+            }
             break;
         case 4:
-            checkAllAccounts(user);
+            checkAllAccounts(user, db);
             break;
         case 5:
-            // student TODO : add your **Make transaction** function
-            // here
+            printf("Enter the account number of the customer: ");
+            while (1)
+            {
+                int accNB;
+                if (scanf("%d", &accNB) == 1)
+                {
+                    printf("Do you want to:\n\t1 --> Withdraw\n\t2 --> Deposit\n\nEnter your choice: ");
+                    while (1)
+                    {
+                        int upOption;
+                        if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
+                        {
+                            makeTransaction(upOption, user, db, accNB);
+                            break;
+                        }
+                        printf("Invalid option! try again : ");
+                        clearInputBuffer();
+                        continue;
+                    }
+                    break;
+                }
+                printf("Invalid option! Please enter account number: ");
+                clearInputBuffer();
+                continue;
+            }
             break;
         case 6:
-            // student TODO : add your **Remove existing account** function
-            // here
+            printf("Enter account number: ");
+            while (1)
+            {
+                int accNB;
+                if (scanf("%d", &accNB) == 1)
+                {
+                    system("clean");
+                    printf("Are you sure you want to remove the %d account\nType [yes] to confirm: ", accNB);
+                    char decision[3];
+                    if (scanf("%3s", decision) == 1 && strcmp(decision, "yes") == 0)
+                        deletAccount(user, db, accNB);
+                    break;
+                    printf("Failed to remove the %d account", accNB);
+                }
+                printf("Invalid option! Please enter account number: ");
+                clearInputBuffer();
+            }
             break;
         case 7:
-            // student TODO : add your **Transfer owner** function
-            // here
+            printf("Enter the account number you want to transfere ownership: ");
+            int accNB;
+            if (scanf("%d", &accNB) == 1)
+            {
+                transferAccount(user, db, accNB);
+                break;
+            }
+            printf("Invalid option! Please retry: ");
+            clearInputBuffer();
             break;
         case 8:
             system("clear");
-            return;
+            sqlite3_close(db);
+            exit(0);
         default:
             system("clear");
             printf("Invalid operation!\n");
@@ -66,7 +149,7 @@ void mainMenu(struct User user, sqlite3 *db)
     }
 }
 
-void initMenu(struct User *user, sqlite3 *db)
+void initMenu(User *user, sqlite3 *db)
 {
     system("clear");
     int retry = 1;
@@ -83,8 +166,7 @@ void initMenu(struct User *user, sqlite3 *db)
         {
             system("clear");
             printf("Invalid option! Please choose a valid operation.\n");
-            while (getchar() != '\n')
-                ;
+            clearInputBuffer();
             continue;
         }
 
@@ -140,10 +222,9 @@ int main()
         return 1;
     }
 
-    struct User u;
+    User u;
     initMenu(&u, db);
     mainMenu(u, db);
 
-    sqlite3_close(db);
     return 0;
 };
