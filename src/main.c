@@ -1,213 +1,257 @@
 #include "header.h"
 #include <sqlite3.h>
 
-void mainMenu(User user, sqlite3 *db)
+int mainMenu(User user, sqlite3 *db)
 {
-    system("clear");
-    while (1)
+    char input[10];
+
+    printf(
+        "\n\n\t\t======= ATM ======="
+        "\n\n\n\t\t-->> Choose an option:"
+        "\n\n\t\t[1]- Create a new account"
+        "\n\n\t\t[2]- Update account information"
+        "\n\n\t\t[3]- Check accounts"
+        "\n\n\t\t[4]- List owned accounts"
+        "\n\n\t\t[5]- Make Transaction"
+        "\n\n\t\t[6]- Remove account"
+        "\n\n\t\t[7]- Transfer ownership"
+        "\n\n\t\t[8]- Exit"
+        "\nEnter your option: ");
+
+    if (fgets(input, sizeof(input), stdin))
     {
-        printf("\n\n\t\t======= ATM =======\n\n");
-        printf("\n\t\t-->> Choose an option:\n");
-        printf("\n\t\t[1]- Create a new account\n");
-        printf("\n\t\t[2]- Update account information\n");
-        printf("\n\t\t[3]- Check accounts\n");
-        printf("\n\t\t[4]- List owned accounts\n");
-        printf("\n\t\t[5]- Make Transaction\n");
-        printf("\n\t\t[6]- Remove account\n");
-        printf("\n\t\t[7]- Transfer ownership\n");
-        printf("\n\t\t[8]- Exit\n");
+        input[strcspn(input, "\n")] = 0;
 
-        int option;
-        if (scanf("%d", &option) != 1)
+        if (strcmp(input, "1") == 0)
         {
-            system("clear");
-            printf("Invalid input!\n");
-            clearInputBuffer();
-            continue;
-        }
-
-        switch (option)
-        {
-        case 1:
             createNewAcc(user, db);
-            break;
-
-        case 2:
+        }
+        else if (strcmp(input, "2") == 0)
         {
-            int accNB;
+            char accInput[10];
             printf("Enter the account number to update: ");
-            if (scanf("%d", &accNB) != 1)
+            if (fgets(accInput, sizeof(accInput), stdin))
             {
-                printf("Invalid account number!\n");
-                clearInputBuffer();
-                break;
-            }
-
-            printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
-            int upOption;
-            if (scanf("%d", &upOption) == 1 && (upOption == 1 || upOption == 2))
-            {
-                updatUserAcc(upOption, user, db, accNB);
-            }
-            else
-            {
-                printf("Invalid option!\n");
-                clearInputBuffer();
-            }
-            break;
-        }
-
-        case 3:
-        {
-            int accNB;
-            printf("Enter account number: ");
-            if (scanf("%d", &accNB) == 1)
-            {
-                checkAcount(user, db, accNB);
-            }
-            else
-            {
-                printf("Invalid account number!\n");
-                clearInputBuffer();
-            }
-            break;
-        }
-
-        case 4:
-            checkAllAccounts(user, db);
-            break;
-
-        case 5:
-        {
-            int accNB;
-            printf("Enter account number: ");
-            if (scanf("%d", &accNB) == 1)
-            {
-                printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
-                int transOption;
-                if (scanf("%d", &transOption) == 1 && (transOption == 1 || transOption == 2))
+                accInput[strcspn(accInput, "\n")] = 0;
+                int accNB = atoi(accInput);
+                if (accNB > 0)
                 {
-                    makeTransaction(transOption, user, db, accNB);
+                    printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
+                    char upInput[10];
+                    if (fgets(upInput, sizeof(upInput), stdin))
+                    {
+                        upInput[strcspn(upInput, "\n")] = 0;
+                        if (strcmp(upInput, "1") == 0 || strcmp(upInput, "2") == 0)
+                        {
+                            int upOption = atoi(upInput);
+                            updatUserAcc(upOption, user, db, accNB);
+                        }
+                        else
+                        {
+                            printf("Invalid option!\n");
+                        }
+                    }
                 }
                 else
                 {
-                    printf("Invalid transaction option!\n");
-                    clearInputBuffer();
+                    printf("Invalid account number!\n");
                 }
             }
-            else
-            {
-                printf("Invalid account number!\n");
-                clearInputBuffer();
-            }
-            break;
         }
-
-        case 6:
+        else if (strcmp(input, "3") == 0)
         {
-            int accNB;
+            char accInput[10];
             printf("Enter account number: ");
-            if (scanf("%d", &accNB) == 1)
+            if (fgets(accInput, sizeof(accInput), stdin))
             {
-                char decision[4];
-                printf("Confirm deletion (yes): ");
-                if (scanf("%3s", decision) == 1 && strcmp(decision, "yes") == 0)
+                accInput[strcspn(accInput, "\n")] = 0;
+                int accNB = atoi(accInput);
+                if (accNB > 0)
                 {
-                    deletAccount(user, db, accNB);
+                    checkAcount(user, db, accNB);
+                }
+                else
+                {
+                    printf("Invalid account number!\n");
                 }
             }
-            else
-            {
-                printf("Invalid account number!\n");
-                clearInputBuffer();
-            }
-            break;
         }
-
-        case 7:
+        else if (strcmp(input, "4") == 0)
         {
-            int accNB;
-            printf("Enter account number to transfer ownership: ");
-            if (scanf("%d", &accNB) == 1)
-            {
-                transferAccount(user, db, accNB);
-            }
-            else
-            {
-                printf("Invalid account number!\n");
-                clearInputBuffer();
-            }
-            break;
+            checkAllAccounts(user, db);
         }
-
-        case 8:
+        else if (strcmp(input, "5") == 0)
+        {
+            char accInput[10];
+            printf("Enter account number: ");
+            if (fgets(accInput, sizeof(accInput), stdin))
+            {
+                accInput[strcspn(accInput, "\n")] = 0;
+                int accNB = atoi(accInput);
+                if (accNB > 0)
+                {
+                    printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
+                    char transInput[10];
+                    if (fgets(transInput, sizeof(transInput), stdin))
+                    {
+                        transInput[strcspn(transInput, "\n")] = 0;
+                        if (strcmp(transInput, "1") == 0 || strcmp(transInput, "2") == 0)
+                        {
+                            int transOption = atoi(transInput);
+                            makeTransaction(transOption, user, db, accNB);
+                        }
+                        else
+                        {
+                            printf("Invalid transaction option!\n");
+                        }
+                    }
+                }
+                else
+                {
+                    printf("Invalid account number!\n");
+                }
+            }
+        }
+        else if (strcmp(input, "6") == 0)
+        {
+            char accInput[10];
+            printf("Enter account number: ");
+            if (fgets(accInput, sizeof(accInput), stdin))
+            {
+                accInput[strcspn(accInput, "\n")] = 0;
+                int accNB = atoi(accInput);
+                if (accNB > 0)
+                {
+                    char decision[10];
+                    printf("Confirm deletion (yes): ");
+                    if (fgets(decision, sizeof(decision), stdin))
+                    {
+                        decision[strcspn(decision, "\n")] = 0;
+                        if (strcmp(decision, "yes") == 0)
+                        {
+                            deletAccount(user, db, accNB);
+                        }
+                        else
+                        {
+                            printf("Deletion canceled.\n");
+                        }
+                    }
+                }
+                else
+                {
+                    printf("Invalid account number!\n");
+                }
+            }
+        }
+        else if (strcmp(input, "7") == 0)
+        {
+            char accInput[10];
+            printf("Enter account number to transfer ownership: ");
+            if (fgets(accInput, sizeof(accInput), stdin))
+            {
+                accInput[strcspn(accInput, "\n")] = 0;
+                int accNB = atoi(accInput);
+                if (accNB > 0)
+                {
+                    transferAccount(user, db, accNB);
+                }
+                else
+                {
+                    printf("Invalid account number!\n");
+                }
+            }
+        }
+        else if (strcmp(input, "8") == 0)
+        {
             system("clear");
             sqlite3_close(db);
             exit(0);
-
-        default:
+        }
+        else
+        {
             system("clear");
-            printf("Invalid option!\n");
+            printf("✖ Invalid option!\n");
         }
     }
+    else
+    {
+        printf("Failed to read input.\n");
+    }
+
+    return 1;
 }
 
-void initMenu(User *user, sqlite3 *db)
+int initMenu(User *user, sqlite3 *db)
 {
-    system("clear");
-    while (1)
+    printf(
+        "\n\n\t\t======= ATM ======="
+        "\n\n\t\t-->> Login/Register:"
+        "\n\n\t\t[1]- Login"
+        "\n\n\t\t[2]- Register"
+        "\n\n\t\t[3]- Exit\n");
+
+    char input[10];
+    if (fgets(input, sizeof(input), stdin))
     {
-        printf("\n\n\t\t======= ATM =======\n");
-        printf("\n\t\t-->> Login/Register:\n");
-        printf("\n\t\t[1]- Login\n");
-        printf("\n\t\t[2]- Register\n");
-        printf("\n\t\t[3]- Exit\n");
+        input[strcspn(input, "\n")] = 0;
 
-        int option;
-        if (scanf("%d", &option) != 1)
+        if (strcmp(input, "1") == 0)
         {
-            system("clear");
-            printf("Invalid input!\n");
-            clearInputBuffer();
-            continue;
+            if (loginMenu(user, db) != 0)
+            {
+                system("clear");
+                printf("✖ Error during login process!");
+                return 1;
+            }
+            return 0;
         }
-
-        switch (option)
+        else if (strcmp(input, "2") == 0)
         {
-        case 1:
-            if (!loginMenu(user, db))
-                return;
-            system("clear");
-            printf("✖ Wrong username or password!");
-            break;
-
-        case 2:
-            if (!registerMenu(user) && !addUserDB(user, db))
-                return;
-            system("clear");
-            printf("✖ Registration failed try again!");
-            break;
-
-        case 3:
-            system("clear");
+            if (registerMenu(user, db) != 0)
+            {
+                system("clear");
+                printf("✖ Error during registration process!");
+                return 1;
+            }
+            return 0;
+        }
+        else if (strcmp(input, "3") == 0)
+        {
             sqlite3_close(db);
             exit(0);
-
-        default:
+        }
+        else
+        {
             system("clear");
-            printf("✖ Invalid option!");
+            printf("✖ Invalid option!\n");
         }
     }
+    return 1;
 }
 
 int main()
 {
+    system("clear");
+
     sqlite3 *db = NULL;
     initDatabase("./data/data.db", &db);
 
     User user;
-    initMenu(&user, db);
-    mainMenu(user, db);
+
+    int err = 0;
+    do
+    {
+        err = initMenu(&user, db);
+        clearInputBuffer();
+    } while (err != 0);
+
+    system("clear");
+
+    do
+    {
+        err = mainMenu(user, db);
+        clearInputBuffer();
+    } while (err != 0);
 
     return 0;
 }

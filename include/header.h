@@ -38,17 +38,17 @@ int loginUserDB(User *user, sqlite3 *db, const char *password);
 int addAccountDB(int userID, Account *acc, sqlite3 *db);
 Account *getAllUserAcc(User *u, sqlite3 *db, int *count);
 Account *getAccData(User u, sqlite3 *db, int accNB);
-int deletAccount(User u,sqlite3 *db, int accNB);
+int deletAccount(User u, sqlite3 *db, int accNB);
 void makeTransaction(int option, User u, sqlite3 *db, int accNB);
 int transferAccount(User u, sqlite3 *db, int accNB);
 
 // authentication functions
 int loginMenu(User *user, sqlite3 *db);
-int registerMenu(User *user);
+int registerMenu(User *user, sqlite3 *db);
 
 // system function
 void createNewAcc(User u, sqlite3 *db);
-void mainMenu(User u, sqlite3 *db);
+int mainMenu(User u, sqlite3 *db);
 void checkAllAccounts(User u, sqlite3 *db);
 void updatUserAcc(int option, User u, sqlite3 *db, int accNB);
 void checkAcount(User u, sqlite3 *db, int accNB);

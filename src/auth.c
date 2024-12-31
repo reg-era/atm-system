@@ -1,17 +1,19 @@
 #include <termios.h>
 #include "header.h"
 
-int registerMenu(User *user)
+int registerMenu(User *user, sqlite3 *db)
 {
     system("clear");
-    printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUser Login: ");
 
-    scanf("%s", user->name);
+    printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUser Login (20 character max): ");
+    if (scanf("%s", user->name) != 1 || strlen(user->name) > 20)
+        return 1;
 
-    printf("\n\n\t\tEnter the password to login: ");
-    scanf("%s", user->password);
+    printf("\n\n\t\tEnter the password to login (30 character max): ");
+    if (scanf("%s", user->password) != 1 || strlen(user->password) > 30)
+        return 1;
 
-    return 0;
+    return addUserDB(user, db);
 }
 
 int loginMenu(User *user, sqlite3 *db)
@@ -20,7 +22,8 @@ int loginMenu(User *user, sqlite3 *db)
 
     system("clear");
     printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUsername: ");
-    scanf("%s", user->name);
+    if (scanf("%s", user->name) != 1 || strlen(user->name) > 20)
+        return 1;
 
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
@@ -32,9 +35,10 @@ int loginMenu(User *user, sqlite3 *db)
         return 1;
     }
 
-    char password[100];
+    char password[50];
     printf("\n\n\t\tEnter the password to login: ");
-    scanf("%s", password);
+    if (scanf("%s", password) != 1 || strlen(password) > 30)
+        return 1;
 
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
