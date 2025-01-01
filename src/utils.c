@@ -4,58 +4,45 @@
 #include <string.h>
 #include "header.h"
 
-void stayOrReturn(void f(User u, sqlite3 *db), User u, sqlite3 *db)
+void finish(User u, sqlite3 *db)
 {
+    char input[10];
     int option;
-invalid:
-    printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-    scanf("%d", &option);
-    if (option == 0)
-        f(u, db);
-    else if (option == 1)
+
+    invalid:
+    printf("Enter 1 to go to the main menu and 0 to exit!\n");
+
+    if (fgets(input, sizeof(input), stdin))
     {
-        mainMenu(u, db);
-    }
-    else if (option == 2)
-    {
+        input[strcspn(input, "\n")] = 0;
+        option = strtol(input, NULL, 10);
+
         system("clear");
-        exit(0);
-    }
-    else
-    {
-        printf("Insert a valid operation!\n");
-        goto invalid;
+
+        if (option == 1)
+        {
+            mainMenu(u, db);
+        }
+        else if (option == 0)
+        {
+            system("clear");
+            exit(0);
+        }
+        else
+        {
+            printf("Insert a valid operation!\n");
+            goto invalid;
+        }
     }
 }
 
-void success(User u, sqlite3 *db)
-{
-    int option;
-    printf("\n✔ Success!\n\n");
-invalid:
-    printf("Enter 1 to go to the main menu and 0 to exit!\n");
-    scanf("%d", &option);
-    system("clear");
-    if (option == 1)
-    {
-        mainMenu(u, db);
-    }
-    else if (option == 0)
-    {
-        system("clear");
-        exit(0);
-    }
-    else
-    {
-        printf("Insert a valid operation!\n");
-        goto invalid;
-    }
-}
 
 void clearInputBuffer()
 {
-    while (getchar() != '\n')
-        ;
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+    }
 }
 
 int validAccountType(char *accountType)

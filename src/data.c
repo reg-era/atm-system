@@ -142,7 +142,7 @@ int addAccountDB(int userID, Account *acc, sqlite3 *db)
     return 1;
 }
 
-Account *getAllUserAcc(User *u, sqlite3 *db, int *count)
+Account *getAllUserAcc(char *username, sqlite3 *db, int *count)
 {
     Account *accounts = NULL;
     sqlite3_stmt *stmt;
@@ -156,7 +156,7 @@ Account *getAllUserAcc(User *u, sqlite3 *db, int *count)
     {
         return NULL;
     }
-    sqlite3_bind_text(stmt, 1, u->name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
 
     int capacity = 3;
 
@@ -200,10 +200,10 @@ Account *getAllUserAcc(User *u, sqlite3 *db, int *count)
     return accounts;
 }
 
-Account *getAccData(User u, sqlite3 *db, int accNB)
+Account *getAccData(char *username, sqlite3 *db, int accNB)
 {
     int count = 0;
-    Account *allacount = getAllUserAcc(&u, db, &count);
+    Account *allacount = getAllUserAcc(username, db, &count);
 
     if (count == 0)
         return NULL;
@@ -222,7 +222,7 @@ Account *getAccData(User u, sqlite3 *db, int accNB)
 void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
 {
     system("clear");
-    Account *accData = getAccData(u, db, accNB);
+    Account *accData = getAccData(u.name, db, accNB);
 
     sqlite3_stmt *stmt;
     const char *sql = option == 1 ? "UPDATE accounts SET phone = ? WHERE id = ? ;" : "UPDATE accounts SET country = ? WHERE id = ? ;";
@@ -235,28 +235,44 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
 
     while (1)
     {
-        printf("Entre the new information: ");
+        printf("Enter the new %s: ",(option == 1) ? "phone number" : "country name");
         if (option == 1)
         {
-            int phone;
-            if (scanf("%d", &phone) == 1 && phone > 0 && phone <= 9999999999)
+            char input[20];
+            if (fgets(input, sizeof(input), stdin))
             {
-                sqlite3_bind_int(stmt, 1, phone);
-                break;
+                input[strcspn(input, "\n")] = 0;
+                int phone = strtol(input, NULL, 10);
+                if (phone > 0 && phone <= 9999999999)
+                {
+                    sqlite3_bind_int(stmt, 1, phone);
+                    break;
+                }
+                else
+                {
+                    printf("✖ Invalid phone number! Please try again.\n");
+                }
             }
         }
         else if (option == 2)
         {
             char country[100];
-            if (scanf("%100s", country) == 1)
+            if (fgets(country, sizeof(country), stdin))
             {
-                sqlite3_bind_text(stmt, 1, country, -1, SQLITE_STATIC);
-                break;
+                country[strcspn(country, "\n")] = 0;
+                if (strlen(country) > 0)
+                {
+                    sqlite3_bind_text(stmt, 1, country, -1, SQLITE_STATIC);
+                    break;
+                }
+                else
+                {
+                    printf("✖ Invalid country name! Please try again.\n");
+                }
             }
         }
         printf("Invalid option! Try again: ");
         clearInputBuffer();
-        break;
     }
 
     sqlite3_bind_int(stmt, 2, accData->id);
@@ -266,13 +282,15 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
         sqlite3_finalize(stmt);
         return;
     }
+
     sqlite3_finalize(stmt);
-    success(u, db);
+    printf("\n✓ Account %s updated succesfuly\n", (option == 1) ? "phone number" : "country name");
+    finish(u, db);
 }
 
 int deletAccount(User u, sqlite3 *db, int accNB)
 {
-    Account *acc = getAccData(u, db, accNB);
+    Account *acc = getAccData(u.name, db, accNB);
 
     if (acc == NULL)
     {
@@ -304,10 +322,11 @@ int deletAccount(User u, sqlite3 *db, int accNB)
 void makeTransaction(int option, User u, sqlite3 *db, int accNB)
 {
     system("clear");
-    Account *accData = getAccData(u, db, accNB);
+    Account *accData = getAccData(u.name, db, accNB);
+
     if (!strcmp(accData->accountType, "fixed01") || !strcmp(accData->accountType, "fixed02") || !strcmp(accData->accountType, "fixed03"))
     {
-        printf("You cannot deposit or withdraw cash in fixed accounts!");
+        printf("You cannot %s cash in fixed accounts!\n", option == 1 ? "withdraw" : "deposit");
         return;
     }
 
@@ -318,18 +337,31 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
         return;
     }
 
+    char input[100];
     double newAmount;
-    printf("Entre the amount to %s: $", option == 1 ? "withdraw" : "Depose");
-    if (scanf("%le", &newAmount) == 1)
+
+    printf("Enter the amount to %s: $", option == 1 ? "withdraw" : "deposit");
+    if (fgets(input, sizeof(input), stdin))
     {
+        input[strcspn(input, "\n")] = 0;
+        newAmount = strtod(input, NULL);
+
+        if (newAmount <= 0)
+        {
+            printf("✖ Invalid amount! Please enter a valid positive number.\n");
+            sqlite3_finalize(stmt);
+            return;
+        }
+
         if (option == 1)
         {
             if (newAmount > accData->amount)
             {
-                printf("✖ The amount you chose to withdraw is superior to your available balance!\n");
+                printf("✖ The amount you chose to withdraw is greater than your available balance!\n");
                 sqlite3_finalize(stmt);
                 return;
             }
+
             sqlite3_bind_double(stmt, 1, (accData->amount - newAmount));
         }
         else
@@ -339,9 +371,11 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
     }
     else
     {
-        printf("✖ Invalid data provided\n");
+        printf("✖ Invalid input data.\n");
+        sqlite3_finalize(stmt);
         return;
     }
+
     sqlite3_bind_int(stmt, 2, accData->id);
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
@@ -351,7 +385,8 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
     }
 
     sqlite3_finalize(stmt);
-    success(u, db);
+    printf("\n✓ Transaction %s processed successfully\n", option == 1 ? "withdraw" : "deposit");
+    finish(u, db);
 }
 
 int getUserID(sqlite3 *db, char *name)
@@ -374,29 +409,37 @@ int getUserID(sqlite3 *db, char *name)
     return userID;
 }
 
-int transferAccount(User u, sqlite3 *db, int accNB)
+int transferAccount(User u, sqlite3 *db, Account *accData)
 {
     system("clear");
-    Account *accData = getAccData(u, db, accNB);
-
-    printf("Which user you want transfer ownership to (user name): ");
+    printf("Which user do you want to transfer ownership to (user name): ");
     char name[50];
-    if (scanf("%50s", name) == 1)
+    
+    if (fgets(name, sizeof(name), stdin))
     {
+        system("clear");
+        name[strcspn(name, "\n")] = 0;
+
         int id = getUserID(db, name);
         if (id < 0)
         {
-            printf("\n✖ user with name %s not found", name);
-            stayOrReturn(&mainMenu, u, db);
-            return 0;
+            printf("✖ Error the user [ %s ] not found\n", name);
+            return 1;
         }
+
         if (!addAccountDB(id, accData, db))
         {
-            printf("\n✖ cannot transfer money");
-            stayOrReturn(&mainMenu, u, db);
-            return 0;
+            printf("✖ Error during transfer processe\n");
+            return 1;
         }
-        deletAccount(u, db, accNB);
+
+        deletAccount(u, db, accData->accountNbr);
     }
+    else
+    {
+        printf("\n✖ Invalid input\n");
+        return 0;
+    }
+
     return 0;
 }

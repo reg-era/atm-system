@@ -3,255 +3,308 @@
 
 int mainMenu(User user, sqlite3 *db)
 {
-    char input[10];
-
-    printf(
-        "\n\n\t\t======= ATM ======="
-        "\n\n\n\t\t-->> Choose an option:"
-        "\n\n\t\t[1]- Create a new account"
-        "\n\n\t\t[2]- Update account information"
-        "\n\n\t\t[3]- Check accounts"
-        "\n\n\t\t[4]- List owned accounts"
-        "\n\n\t\t[5]- Make Transaction"
-        "\n\n\t\t[6]- Remove account"
-        "\n\n\t\t[7]- Transfer ownership"
-        "\n\n\t\t[8]- Exit"
-        "\nEnter your option: ");
-
-    if (fgets(input, sizeof(input), stdin))
+    system("clear");
+    while (1)
     {
-        input[strcspn(input, "\n")] = 0;
+        char input[10];
+        printf(
+            "\n\n\t\t======= ATM ======="
+            "\n\n\n\t\t-->> Choose an option:"
+            "\n\n\t\t[1]- Create a new account"
+            "\n\n\t\t[2]- Update account information"
+            "\n\n\t\t[3]- Check accounts"
+            "\n\n\t\t[4]- List owned accounts"
+            "\n\n\t\t[5]- Make Transaction"
+            "\n\n\t\t[6]- Remove account"
+            "\n\n\t\t[7]- Transfer ownership"
+            "\n\n\t\t[8]- Exit"
+            "\n\nEnter your option: ");
 
-        if (strcmp(input, "1") == 0)
+        if (fgets(input, sizeof(input), stdin))
         {
-            createNewAcc(user, db);
-        }
-        else if (strcmp(input, "2") == 0)
-        {
-            char accInput[10];
-            printf("Enter the account number to update: ");
-            if (fgets(accInput, sizeof(accInput), stdin))
+            input[strcspn(input, "\n")] = 0;
+
+            if (strcmp(input, "1") == 0)
             {
-                accInput[strcspn(accInput, "\n")] = 0;
-                int accNB = atoi(accInput);
-                if (accNB > 0)
+                if (!createNewAcc(user, db))
                 {
-                    printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
-                    char upInput[10];
-                    if (fgets(upInput, sizeof(upInput), stdin))
+                    system("clear");
+                    printf("✖ Error on creation account try again");
+                }
+            }
+            else if (strcmp(input, "2") == 0)
+            {
+                char accInput[10];
+                printf("Enter the account number to update: ");
+                if (fgets(accInput, sizeof(accInput), stdin))
+                {
+                    accInput[strcspn(accInput, "\n")] = 0;
+                    int accNB = atoi(accInput);
+                    if (accNB > 0 && getAccData(user.name, db, accNB) != NULL)
                     {
-                        upInput[strcspn(upInput, "\n")] = 0;
-                        if (strcmp(upInput, "1") == 0 || strcmp(upInput, "2") == 0)
+                        printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
+                        char upInput[10];
+                        if (fgets(upInput, sizeof(upInput), stdin))
                         {
-                            int upOption = atoi(upInput);
-                            updatUserAcc(upOption, user, db, accNB);
+                            upInput[strcspn(upInput, "\n")] = 0;
+                            if (strcmp(upInput, "1") == 0 || strcmp(upInput, "2") == 0)
+                            {
+                                int upOption = atoi(upInput);
+                                updatUserAcc(upOption, user, db, accNB);
+                            }
+                            else
+                            {
+                                system("clear");
+                                printf("✖ Error invalid option!\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        system("clear");
+                        printf("✖ Error invalid account number!\n");
+                    }
+                }
+            }
+            else if (strcmp(input, "3") == 0)
+            {
+                char accInput[10];
+                printf("Enter account number: ");
+                if (fgets(accInput, sizeof(accInput), stdin))
+                {
+                    accInput[strcspn(accInput, "\n")] = 0;
+                    int accNB = atoi(accInput);
+                    if (accNB > 0)
+                    {
+                        checkAcount(user, db, accNB);
+                    }
+                    else
+                    {
+                        system("clear");
+                        printf("✖ Error invalid account number!\n");
+                    }
+                }
+            }
+            else if (strcmp(input, "4") == 0)
+            {
+                checkAllAccounts(user, db);
+            }
+            else if (strcmp(input, "5") == 0)
+            {
+                char accInput[10];
+                printf("Enter account number: ");
+                if (fgets(accInput, sizeof(accInput), stdin))
+                {
+                    accInput[strcspn(accInput, "\n")] = 0;
+                    int accNB = atoi(accInput);
+                    if (accNB > 0 && getAccData(user.name, db, accNB) != NULL)
+                    {
+                        printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
+                        char transInput[10];
+                        if (fgets(transInput, sizeof(transInput), stdin))
+                        {
+                            transInput[strcspn(transInput, "\n")] = 0;
+                            if (strcmp(transInput, "1") == 0 || strcmp(transInput, "2") == 0)
+                            {
+                                int transOption = atoi(transInput);
+                                makeTransaction(transOption, user, db, accNB);
+                            }
+                            else
+                            {
+                                system("clear");
+                                printf("✖ Error invalid transaction option!\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        system("clear");
+                        printf("✖ Error account not found!\n");
+                    }
+                }
+            }
+            else if (strcmp(input, "6") == 0)
+            {
+                char accInput[10];
+                printf("Enter account number: ");
+                if (fgets(accInput, sizeof(accInput), stdin))
+                {
+                    accInput[strcspn(accInput, "\n")] = 0;
+                    int accNB = atoi(accInput);
+                    Account *userAccount = getAccData(user.name, db, accNB);
+                    if (accNB > 0 && userAccount != NULL)
+                    {
+                        char decision[10];
+                        printf("Confirm deletion (yes): ");
+                        if (fgets(decision, sizeof(decision), stdin))
+                        {
+                            decision[strcspn(decision, "\n")] = 0;
+                            if (strcmp(decision, "yes") == 0)
+                            {
+                                if (deletAccount(user, db, accNB))
+                                {
+                                    system("clear");
+                                    printf("✖ Error failed account deletion\n");
+                                }
+                                else
+                                {
+                                    system("clear");
+                                    printf(
+                                        "\n======= Deleted Account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n"
+                                        "\n✓ Account deleted succesfuly\n",
+                                        userAccount->accountNbr,
+                                        userAccount->deposit.day,
+                                        userAccount->deposit.month,
+                                        userAccount->deposit.year,
+                                        userAccount->country,
+                                        userAccount->phone,
+                                        userAccount->amount,
+                                        userAccount->accountType);
+                                    finish(user, db);
+                                }
+                            }
+                            else
+                            {
+                                system("clear");
+                                printf("✖ Deletion canceled\n");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        system("clear");
+                        printf("✖ Error invalid account number!\n");
+                    }
+                }
+            }
+            else if (strcmp(input, "7") == 0)
+            {
+                char accInput[10];
+                printf("Enter account number to transfer ownership: ");
+                if (fgets(accInput, sizeof(accInput), stdin))
+                {
+                    accInput[strcspn(accInput, "\n")] = 0;
+                    int accNB = atoi(accInput);
+                    Account *userAccount = getAccData(user.name, db, accNB);
+                    if (accNB > 0 && userAccount != NULL)
+                    {
+                        if (transferAccount(user, db, userAccount))
+                        {
+                            continue;
                         }
                         else
                         {
-                            printf("Invalid option!\n");
+                            system("clear");
+                            printf(
+                                "\n======= Transfered account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n"
+                                "\n✓ Account transfered succesfuly\n",
+                                userAccount->accountNbr,
+                                userAccount->deposit.day,
+                                userAccount->deposit.month,
+                                userAccount->deposit.year,
+                                userAccount->country,
+                                userAccount->phone,
+                                userAccount->amount,
+                                userAccount->accountType);
+                            finish(user, db);
                         }
                     }
-                }
-                else
-                {
-                    printf("Invalid account number!\n");
-                }
-            }
-        }
-        else if (strcmp(input, "3") == 0)
-        {
-            char accInput[10];
-            printf("Enter account number: ");
-            if (fgets(accInput, sizeof(accInput), stdin))
-            {
-                accInput[strcspn(accInput, "\n")] = 0;
-                int accNB = atoi(accInput);
-                if (accNB > 0)
-                {
-                    checkAcount(user, db, accNB);
-                }
-                else
-                {
-                    printf("Invalid account number!\n");
-                }
-            }
-        }
-        else if (strcmp(input, "4") == 0)
-        {
-            checkAllAccounts(user, db);
-        }
-        else if (strcmp(input, "5") == 0)
-        {
-            char accInput[10];
-            printf("Enter account number: ");
-            if (fgets(accInput, sizeof(accInput), stdin))
-            {
-                accInput[strcspn(accInput, "\n")] = 0;
-                int accNB = atoi(accInput);
-                if (accNB > 0)
-                {
-                    printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
-                    char transInput[10];
-                    if (fgets(transInput, sizeof(transInput), stdin))
+                    else
                     {
-                        transInput[strcspn(transInput, "\n")] = 0;
-                        if (strcmp(transInput, "1") == 0 || strcmp(transInput, "2") == 0)
-                        {
-                            int transOption = atoi(transInput);
-                            makeTransaction(transOption, user, db, accNB);
-                        }
-                        else
-                        {
-                            printf("Invalid transaction option!\n");
-                        }
+                        system("clear");
+                        printf("✖ Error invalid account number!\n");
                     }
                 }
-                else
-                {
-                    printf("Invalid account number!\n");
-                }
             }
-        }
-        else if (strcmp(input, "6") == 0)
-        {
-            char accInput[10];
-            printf("Enter account number: ");
-            if (fgets(accInput, sizeof(accInput), stdin))
+            else if (strcmp(input, "8") == 0)
             {
-                accInput[strcspn(accInput, "\n")] = 0;
-                int accNB = atoi(accInput);
-                if (accNB > 0)
-                {
-                    char decision[10];
-                    printf("Confirm deletion (yes): ");
-                    if (fgets(decision, sizeof(decision), stdin))
-                    {
-                        decision[strcspn(decision, "\n")] = 0;
-                        if (strcmp(decision, "yes") == 0)
-                        {
-                            deletAccount(user, db, accNB);
-                        }
-                        else
-                        {
-                            printf("Deletion canceled.\n");
-                        }
-                    }
-                }
-                else
-                {
-                    printf("Invalid account number!\n");
-                }
+                system("clear");
+                sqlite3_close(db);
+                exit(0);
             }
-        }
-        else if (strcmp(input, "7") == 0)
-        {
-            char accInput[10];
-            printf("Enter account number to transfer ownership: ");
-            if (fgets(accInput, sizeof(accInput), stdin))
+            else
             {
-                accInput[strcspn(accInput, "\n")] = 0;
-                int accNB = atoi(accInput);
-                if (accNB > 0)
-                {
-                    transferAccount(user, db, accNB);
-                }
-                else
-                {
-                    printf("Invalid account number!\n");
-                }
+                system("clear");
+                printf("✖ Invalid option!");
             }
-        }
-        else if (strcmp(input, "8") == 0)
-        {
-            system("clear");
-            sqlite3_close(db);
-            exit(0);
-        }
-        else
-        {
-            system("clear");
-            printf("✖ Invalid option!\n");
         }
     }
-    else
-    {
-        printf("Failed to read input.\n");
-    }
-
     return 1;
 }
 
 int initMenu(User *user, sqlite3 *db)
 {
-    printf(
-        "\n\n\t\t======= ATM ======="
-        "\n\n\t\t-->> Login/Register:"
-        "\n\n\t\t[1]- Login"
-        "\n\n\t\t[2]- Register"
-        "\n\n\t\t[3]- Exit\n");
-
-    char input[10];
-    if (fgets(input, sizeof(input), stdin))
+    system("clear");
+    while (1)
     {
-        input[strcspn(input, "\n")] = 0;
+        printf(
+            "\n\n\t\t======= ATM ======="
+            "\n\n\t\t-->> Login/Register:"
+            "\n\n\t\t[1]- Login"
+            "\n\n\t\t[2]- Register"
+            "\n\n\t\t[3]- Exit\n");
 
-        if (strcmp(input, "1") == 0)
+        char input[10];
+        if (fgets(input, sizeof(input), stdin))
         {
-            if (loginMenu(user, db) != 0)
+            input[strcspn(input, "\n")] = 0;
+
+            if (strcmp(input, "1") == 0)
             {
-                system("clear");
-                printf("✖ Error during login process!");
-                return 1;
+                if (loginMenu(user, db) != 0)
+                {
+                    system("clear");
+                    printf("✖ Error or user not found during login process!");
+                    clearInputBuffer();
+                    continue;
+                }
+                clearInputBuffer();
+                return 0;
             }
-            return 0;
-        }
-        else if (strcmp(input, "2") == 0)
-        {
-            if (registerMenu(user, db) != 0)
+            else if (strcmp(input, "2") == 0)
             {
-                system("clear");
-                printf("✖ Error during registration process!");
-                return 1;
+                if (registerMenu(user, db) != 0)
+                {
+                    system("clear");
+                    printf("✖ Error or user already exists registration process!");
+                    clearInputBuffer();
+                    continue;
+                }
+                clearInputBuffer();
+                return 0;
             }
-            return 0;
+            else if (strcmp(input, "3") == 0)
+            {
+                sqlite3_close(db);
+                exit(0);
+            }
         }
-        else if (strcmp(input, "3") == 0)
-        {
-            sqlite3_close(db);
-            exit(0);
-        }
-        else
-        {
-            system("clear");
-            printf("✖ Invalid option!\n");
-        }
+        system("clear");
+        printf("✖ Invalid option!");
     }
     return 1;
 }
 
 int main()
 {
-    system("clear");
-
     sqlite3 *db = NULL;
     initDatabase("./data/data.db", &db);
 
     User user;
 
-    int err = 0;
-    do
+    if (initMenu(&user, db))
     {
-        err = initMenu(&user, db);
-        clearInputBuffer();
-    } while (err != 0);
+        system("clear");
+        printf("error on registation system\n");
+        exit(1);
+    }
 
-    system("clear");
-
-    do
+    if (mainMenu(user, db))
     {
-        err = mainMenu(user, db);
-        clearInputBuffer();
-    } while (err != 0);
+        system("clear");
+        printf("error on interface system\n");
+        exit(1);
+    }
 
     return 0;
 }

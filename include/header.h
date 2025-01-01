@@ -36,26 +36,25 @@ void initDatabase(const char *url, sqlite3 **db);
 int addUserDB(User *u, sqlite3 *db);
 int loginUserDB(User *user, sqlite3 *db, const char *password);
 int addAccountDB(int userID, Account *acc, sqlite3 *db);
-Account *getAllUserAcc(User *u, sqlite3 *db, int *count);
-Account *getAccData(User u, sqlite3 *db, int accNB);
+Account *getAllUserAcc(char *username, sqlite3 *db, int *count);
+Account *getAccData(char *username, sqlite3 *db, int accNB);
 int deletAccount(User u, sqlite3 *db, int accNB);
 void makeTransaction(int option, User u, sqlite3 *db, int accNB);
-int transferAccount(User u, sqlite3 *db, int accNB);
+int transferAccount(User u, sqlite3 *db, Account *accData);
 
 // authentication functions
 int loginMenu(User *user, sqlite3 *db);
 int registerMenu(User *user, sqlite3 *db);
 
 // system function
-void createNewAcc(User u, sqlite3 *db);
+int createNewAcc(User u, sqlite3 *db);
 int mainMenu(User u, sqlite3 *db);
 void checkAllAccounts(User u, sqlite3 *db);
 void updatUserAcc(int option, User u, sqlite3 *db, int accNB);
 void checkAcount(User u, sqlite3 *db, int accNB);
 
 // utilitis function
-void success(User u, sqlite3 *db);
-void stayOrReturn(void f(User u, sqlite3 *db), User u, sqlite3 *db);
+void finish(User u, sqlite3 *db);
 
 void clearInputBuffer();
 int validAccountType(char *accountType);

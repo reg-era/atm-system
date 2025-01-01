@@ -1,88 +1,163 @@
 #include <math.h>
 #include "header.h"
 
-void createNewAcc(User u, sqlite3 *db)
+int createNewAcc(User u, sqlite3 *db)
 {
     Account acc;
+    char input[100];
 
     system("clear");
     printf("\t\t\t===== New record =====\n");
 
-    while (1)
+    int tryCount = 0;
+    while (tryCount < 3)
     {
         printf("\nEnter today's date (dd/mm/yyyy): ");
-        if (scanf("%d/%d/%d", &acc.deposit.day, &acc.deposit.month, &acc.deposit.year) == 3 && validDate(acc.deposit.day, acc.deposit.month, acc.deposit.year))
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid date");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            if (sscanf(input, "%d/%d/%d", &acc.deposit.day, &acc.deposit.month, &acc.deposit.year) == 3 &&
+                validDate(acc.deposit.day, acc.deposit.month, acc.deposit.year))
+                break;
+            else
+            {
+                tryCount++;
+                printf("✖ Invalid date\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
-    while (1)
+    tryCount = 0;
+    while (tryCount < 3)
     {
-        printf("\nEnter the account number: ");
-        if (scanf("%d", &acc.accountNbr) == 1 && acc.accountNbr > 0)
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid number");
+        printf("\nEnter the account number (may not be taken): ");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            acc.accountNbr = strtol(input, NULL, 10);
+            if (acc.accountNbr > 0)
+            {
+                if (getAccData(u.name, db, acc.accountNbr) != NULL)
+                {
+                    printf("✖ Account number exists\n");
+                    tryCount++;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                printf("✖ Invalid account number\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
-    while (1)
+    tryCount = 0;
+    while (tryCount < 3)
     {
         printf("\nEnter the country: ");
-        if (scanf("%s", acc.country) == 1 && strlen(acc.country) != 0)
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid country name");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            input[strcspn(input, "\n")] = 0;
+            if (strlen(input) > 0)
+            {
+                strncpy(acc.country, input, sizeof(acc.country) - 1);
+                acc.country[sizeof(acc.country) - 1] = '\0';
+                break;
+            }
+            else
+            {
+                printf("✖ Invalid country name\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
-    while (1)
+    tryCount = 0;
+    while (tryCount < 3)
     {
         printf("\nEnter the phone number (10 digits): ");
-        if (scanf("%d", &acc.phone) == 1 && acc.phone > 0 && acc.phone <= 9999999999)
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid phone number");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            acc.phone = strtol(input, NULL, 10);
+            if (acc.phone > 0 && acc.phone <= 9999999999)
+            {
+                break;
+            }
+            else
+            {
+                printf("✖ Invalid phone number\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
-    while (1)
+    tryCount = 0;
+    while (tryCount < 3)
     {
         printf("\nEnter amount to deposit: $");
-        if (scanf("%lf", &acc.amount) == 1 && acc.amount > 0)
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid deposit amount");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            acc.amount = strtod(input, NULL);
+            if (acc.amount > 0)
+            {
+                break;
+            }
+            else
+            {
+                printf("✖ Invalid deposit amount\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n");
-    while (1)
+    tryCount = 0;
+    while (tryCount < 3)
     {
         printf(" Enter your choice: ");
-        if (scanf("%s", acc.accountType) == 1 && validAccountType(acc.accountType))
-            break;
-        clearInputBuffer();
-        printf("✖ Invalid account type");
+        if (fgets(input, sizeof(input), stdin))
+        {
+            input[strcspn(input, "\n")] = 0;
+            if (validAccountType(input))
+            {
+                strncpy(acc.accountType, input, sizeof(acc.accountType) - 1);
+                acc.accountType[sizeof(acc.accountType) - 1] = '\0';
+                break;
+            }
+            else
+            {
+                printf("✖ Invalid account type\n");
+            }
+        }
+        if (tryCount == 3)
+            return 0;
     }
 
     if (addAccountDB(u.id, &acc, db))
     {
-        success(u, db);
+        printf("\n✓ Account create succesfuly\n");
+        finish(u, db);
+        return 1;
     }
-    else
-    {
-        system("clear");
-        printf("%s", sqlite3_errmsg(db));
-        stayOrReturn(&createNewAcc, u, db);
-    }
+    return 0;
 }
 
 void checkAllAccounts(User u, sqlite3 *db)
 {
     int count = 0;
-    Account *allacount = getAllUserAcc(&u, db, &count);
+    Account *allacount = getAllUserAcc(u.name, db, &count);
 
     if (allacount == NULL)
     {
-        stayOrReturn(&createNewAcc, u, db);
         return;
     }
 
@@ -104,18 +179,18 @@ void checkAllAccounts(User u, sqlite3 *db)
     }
 
     free(allacount);
-    success(u, db);
+    printf("\n✓ All account information displayed succesfuly\n");
+    finish(u, db);
 }
 
 void checkAcount(User u, sqlite3 *db, int accNB)
 {
     system("clear");
-    Account *accountData = getAccData(u, db, accNB);
+    Account *accountData = getAccData(u.name, db, accNB);
 
     if (accountData == NULL)
     {
-        printf("Account not found\n");
-        stayOrReturn(&mainMenu, u, db);
+        printf("✖ Error account not found\n");
         return;
     }
 
@@ -159,6 +234,7 @@ void checkAcount(User u, sqlite3 *db, int accNB)
             round(accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month);
     }
 
-    success(u, db);
+    printf("\n✓ Acount information displayed succesfuly\n");
+    finish(u, db);
     return;
 }
