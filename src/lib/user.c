@@ -12,7 +12,7 @@ void checkAccount(User u, sqlite3 *db, int accNB)
     }
 
     printf(
-        "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+        "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%s \nAmount deposited: $%.2f \nType Of Account:%s\n",
         accountData->accountNbr,
         accountData->deposit.day,
         accountData->deposit.month,
@@ -72,7 +72,7 @@ void checkAllAccounts(User u, sqlite3 *db)
     {
         printf("_____________________\n");
         printf(
-            "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
+            "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%s \nAmount deposited: $%.2f \nType Of Account:%s\n",
             allacount[i].accountNbr,
             allacount[i].deposit.day,
             allacount[i].deposit.month,
@@ -107,14 +107,13 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
         printf("Enter the new %s: ", (option == 1) ? "phone number" : "country name");
         if (option == 1)
         {
-            char input[20];
-            if (fgets(input, sizeof(input), stdin))
+            char phone[50];
+            if (fgets(phone, sizeof(phone), stdin))
             {
-                input[strcspn(input, "\n")] = 0;
-                int phone = strtol(input, NULL, 10);
-                if (phone > 0 && phone <= 9999999999)
+                phone[strcspn(phone, "\n")] = 0;
+                if (strlen(phone) > 0)
                 {
-                    sqlite3_bind_int(stmt, 1, phone);
+                    sqlite3_bind_text(stmt, 1, phone, -1, SQLITE_STATIC);
                     break;
                 }
                 else
@@ -125,7 +124,7 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
         }
         else if (option == 2)
         {
-            char country[100];
+            char country[50];
             if (fgets(country, sizeof(country), stdin))
             {
                 country[strcspn(country, "\n")] = 0;
@@ -141,7 +140,6 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
             }
         }
         printf("Invalid option! Try again: ");
-        clearInputBuffer();
     }
 
     sqlite3_bind_int(stmt, 2, accData->id);

@@ -22,23 +22,17 @@ int initMenu(User *user, sqlite3 *db)
                 if (loginMenu(user, db) != 0)
                 {
                     system("clear");
-                    printf("✖ Error or user not found during login process!");
-                    clearInputBuffer();
+                    printf("✖ Error or credential not found during login process!");
                     continue;
                 }
-                clearInputBuffer();
                 return 0;
             }
             else if (strcmp(input, "2") == 0)
             {
                 if (registerMenu(user, db) != 0)
                 {
-                    system("clear");
-                    printf("✖ Error or user already exists registration process!");
-                    clearInputBuffer();
                     continue;
                 }
-                clearInputBuffer();
                 return 0;
             }
             else if (strcmp(input, "3") == 0)

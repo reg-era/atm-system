@@ -25,11 +25,7 @@ int mainMenu(User user, sqlite3 *db)
 
             if (strcmp(input, "1") == 0)
             {
-                if (!createNewAcc(user, db))
-                {
-                    system("clear");
-                    printf("✖ Error on creation account try again");
-                }
+                createNewAcc(user, db);
             }
             else if (strcmp(input, "2") == 0)
             {
@@ -149,7 +145,7 @@ int mainMenu(User user, sqlite3 *db)
                                 {
                                     system("clear");
                                     printf(
-                                        "\n======= Deleted Account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n"
+                                        "\n======= Deleted Account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%s \nAmount deposited: $%.2f \nType Of Account:%s\n"
                                         "\n✓ Account deleted succesfuly\n",
                                         userAccount->accountNbr,
                                         userAccount->deposit.day,
@@ -195,7 +191,7 @@ int mainMenu(User user, sqlite3 *db)
                         {
                             system("clear");
                             printf(
-                                "\n======= Transfered account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n"
+                                "\n======= Transfered account =======\n\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%s \nAmount deposited: $%.2f \nType Of Account:%s\n"
                                 "\n✓ Account transfered succesfuly\n",
                                 userAccount->accountNbr,
                                 userAccount->deposit.day,

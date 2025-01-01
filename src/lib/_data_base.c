@@ -126,7 +126,7 @@ int addAccountDB(int userID, Account *acc, sqlite3 *db)
     sqlite3_bind_int(stmt, 2, acc->accountNbr);
     sqlite3_bind_text(stmt, 3, acc->accountType, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, acc->country, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 5, acc->phone);
+    sqlite3_bind_text(stmt, 5, acc->phone, -1, SQLITE_STATIC);
     sqlite3_bind_double(stmt, 6, acc->amount);
     sqlite3_bind_int(stmt, 7, userID);
 
@@ -183,7 +183,7 @@ Account *getAllUserAcc(char *username, sqlite3 *db, int *count)
         accounts[i].accountNbr = sqlite3_column_int(stmt, 2);
         strncpy(accounts[i].accountType, (const char *)sqlite3_column_text(stmt, 3), sizeof(accounts[i].accountType));
         strncpy(accounts[i].country, (const char *)sqlite3_column_text(stmt, 4), sizeof(accounts[i].country));
-        accounts[i].phone = sqlite3_column_int(stmt, 5);
+        strncpy(accounts[i].phone, (const char *)sqlite3_column_text(stmt, 5), sizeof(accounts[i].phone));
         accounts[i].amount = sqlite3_column_double(stmt, 6);
 
         const char *dateStr = (const char *)sqlite3_column_text(stmt, 7);

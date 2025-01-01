@@ -35,8 +35,6 @@ int transferAccount(User u, sqlite3 *db, Account *accData);
 
 // utility functions
 void finish(User u, sqlite3 *db);
-void clearInputBuffer();
-int validAccountType(char *accountType);
 int validDate(int month, int day, int year);
 
 #endif

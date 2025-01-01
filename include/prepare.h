@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <termios.h>
+#include <unistd.h>
 #include <math.h>
 #include <ctype.h>
 #include <string.h>
@@ -19,8 +19,8 @@ typedef struct
 {
     int id;
     int userId;
-    char country[100];
-    int phone;
+    char country[50];
+    char phone[50];
     char accountType[10];
     int accountNbr;
     double amount;
