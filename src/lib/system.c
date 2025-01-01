@@ -1,4 +1,3 @@
-#include <math.h>
 #include "header.h"
 
 int createNewAcc(User u, sqlite3 *db)
@@ -151,90 +150,107 @@ int createNewAcc(User u, sqlite3 *db)
     return 0;
 }
 
-void checkAllAccounts(User u, sqlite3 *db)
+void makeTransaction(int option, User u, sqlite3 *db, int accNB)
 {
-    int count = 0;
-    Account *allacount = getAllUserAcc(u.name, db, &count);
+    system("clear");
+    Account *accData = getAccData(u.name, db, accNB);
 
-    if (allacount == NULL)
+    if (!strcmp(accData->accountType, "fixed01") || !strcmp(accData->accountType, "fixed02") || !strcmp(accData->accountType, "fixed03"))
     {
+        printf("You cannot %s cash in fixed accounts!\n", option == 1 ? "withdraw" : "deposit");
         return;
     }
 
-    system("clear");
-    printf("\t\t====== All accounts from user, %s =====\n\n", u.name);
-    for (int i = 0; i < count; i++)
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, "UPDATE accounts SET balance = ? WHERE id = ? ;", -1, &stmt, 0) != SQLITE_OK)
     {
-        printf("_____________________\n");
-        printf(
-            "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
-            allacount[i].accountNbr,
-            allacount[i].deposit.day,
-            allacount[i].deposit.month,
-            allacount[i].deposit.year,
-            allacount[i].country,
-            allacount[i].phone,
-            allacount[i].amount,
-            allacount[i].accountType);
+        sqlite3_finalize(stmt);
+        return;
     }
 
-    free(allacount);
-    printf("\n✓ All account information displayed succesfuly\n");
+    char input[100];
+    double newAmount;
+
+    printf("Enter the amount to %s: $", option == 1 ? "withdraw" : "deposit");
+    if (fgets(input, sizeof(input), stdin))
+    {
+        input[strcspn(input, "\n")] = 0;
+        newAmount = strtod(input, NULL);
+
+        if (newAmount <= 0)
+        {
+            printf("✖ Invalid amount! Please enter a valid positive number.\n");
+            sqlite3_finalize(stmt);
+            return;
+        }
+
+        if (option == 1)
+        {
+            if (newAmount > accData->amount)
+            {
+                printf("✖ The amount you chose to withdraw is greater than your available balance!\n");
+                sqlite3_finalize(stmt);
+                return;
+            }
+
+            sqlite3_bind_double(stmt, 1, (accData->amount - newAmount));
+        }
+        else
+        {
+            sqlite3_bind_double(stmt, 1, (accData->amount + newAmount));
+        }
+    }
+    else
+    {
+        printf("✖ Invalid input data.\n");
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 2, accData->id);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    sqlite3_finalize(stmt);
+    printf("\n✓ Transaction %s processed successfully\n", option == 1 ? "withdraw" : "deposit");
     finish(u, db);
 }
 
-void checkAcount(User u, sqlite3 *db, int accNB)
+int transferAccount(User u, sqlite3 *db, Account *accData)
 {
     system("clear");
-    Account *accountData = getAccData(u.name, db, accNB);
+    printf("Which user do you want to transfer ownership to (user name): ");
+    char name[50];
 
-    if (accountData == NULL)
+    if (fgets(name, sizeof(name), stdin))
     {
-        printf("✖ Error account not found\n");
-        return;
-    }
+        system("clear");
+        name[strcspn(name, "\n")] = 0;
 
-    printf(
-        "\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
-        accountData->accountNbr,
-        accountData->deposit.day,
-        accountData->deposit.month,
-        accountData->deposit.year,
-        accountData->country,
-        accountData->phone,
-        accountData->amount,
-        accountData->accountType);
+        int id = getUserID(db, name);
+        if (id < 0)
+        {
+            printf("✖ Error the user [ %s ] not found\n", name);
+            return 1;
+        }
 
-    if (strcmp(accountData->accountType, "current") == 0)
-    {
-        printf(" --> You will not get interests because the account is of type current");
+        if (!addAccountDB(id, accData, db))
+        {
+            printf("✖ Error during transfer processe\n");
+            return 1;
+        }
+
+        deletAccount(u, db, accData->accountNbr);
     }
-    else if (strcmp(accountData->accountType, "saving") == 0)
+    else
     {
-        printf(
-            " --> You will get $%.2f as interest on day %d of every month",
-            round((accountData->amount * (0.07) * (1 / 12))), accountData->deposit.day);
-    }
-    else if (strcmp(accountData->accountType, "fixed01") == 0)
-    {
-        printf(
-            " --> You will get $%.2f as interest on day %d/%d of every year",
-            round(accountData->amount * 0.04), accountData->deposit.day, accountData->deposit.month);
-    }
-    else if (strcmp(accountData->accountType, "fixed02") == 0)
-    {
-        printf(
-            " --> You will get $%.2f as interest on day %d/%d of every 2 year",
-            round(accountData->amount * 0.05 * 2), accountData->deposit.day, accountData->deposit.month);
-    }
-    else if (strcmp(accountData->accountType, "fixed03") == 0)
-    {
-        printf(
-            " --> You will get $%.2f as interest on day %d/%d of every 3 years",
-            round(accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month);
+        printf("\n✖ Invalid input\n");
+        return 0;
     }
 
-    printf("\n✓ Acount information displayed succesfuly\n");
-    finish(u, db);
-    return;
+    return 0;
 }

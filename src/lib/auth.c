@@ -1,4 +1,3 @@
-#include <termios.h>
 #include "header.h"
 
 int registerMenu(User *user, sqlite3 *db)
