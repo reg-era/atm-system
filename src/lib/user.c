@@ -30,25 +30,25 @@ void checkAccount(User u, sqlite3 *db, int accNB)
     {
         printf(
             " --> You will get $%.2f as interest on day %d of every month",
-            round((accountData->amount * (0.07) * (1 / 12))), accountData->deposit.day);
+            (accountData->amount * 0.07 * (1.0 / 12)), accountData->deposit.day);
     }
     else if (strcmp(accountData->accountType, "fixed01") == 0)
     {
         printf(
-            " --> You will get $%.2f as interest on day %d/%d of every year",
-            round(accountData->amount * 0.04), accountData->deposit.day, accountData->deposit.month);
+            " --> You will get $%.2f as interest on day %d/%d/%d",
+            (accountData->amount * 0.04), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+1);
     }
     else if (strcmp(accountData->accountType, "fixed02") == 0)
     {
         printf(
-            " --> You will get $%.2f as interest on day %d/%d of every 2 year",
-            round(accountData->amount * 0.05 * 2), accountData->deposit.day, accountData->deposit.month);
+            " --> You will get $%.2f as interest on day %d/%d/%d",
+            (accountData->amount * 0.05 * 2), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+2);
     }
     else if (strcmp(accountData->accountType, "fixed03") == 0)
     {
         printf(
-            " --> You will get $%.2f as interest on day %d/%d of every 3 years",
-            round(accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month);
+            " --> You will get $%.2f as interest on day %d/%d/%d",
+            (accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+3);
     }
 
     printf("\n✓ Acount information displayed succesfuly\n");

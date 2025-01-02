@@ -4,15 +4,15 @@ CFLAGS = -Wall -g -I./include
 SOURCES = $(wildcard src/**/*.c src/*.c)
 OBJECTS = $(patsubst src/%.c, bin/%.o, $(SOURCES))
 
-build: bin/atm
+build: clean prepare bin/atm
 
 bin/atm: $(OBJECTS)
-	$(CC) $^ -o $@ -lsqlite3 -lm
+	$(CC) $^ -o $@ -lsqlite3
 
 bin/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-run: build
+run:
 	./bin/atm
 
 prepare:
@@ -21,4 +21,4 @@ prepare:
 clean:
 	rm -rf bin
 
-all: clean prepare build run
+all: build run

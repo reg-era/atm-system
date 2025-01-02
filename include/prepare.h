@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
 #include <ctype.h>
 #include <string.h>
 #include <sqlite3.h>
