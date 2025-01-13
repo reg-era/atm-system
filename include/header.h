@@ -12,7 +12,7 @@ void initDatabase(const char *url, sqlite3 **db);
 
 // database function
 int addUserDB(User *u, sqlite3 *db);
-int loginUserDB(User *user, sqlite3 *db, const char *password);
+int loginUserDB(User *user, sqlite3 *db, char *password);
 int addAccountDB(int userID, Account *acc, sqlite3 *db);
 Account *getAllUserAcc(char *username, sqlite3 *db, int *count);
 Account *getAccData(char *username, sqlite3 *db, int accNB);

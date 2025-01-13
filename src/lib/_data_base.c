@@ -71,11 +71,12 @@ int addUserDB(User *user, sqlite3 *db)
     return 0;
 }
 
-int loginUserDB(User *user, sqlite3 *db, const char *password)
+int loginUserDB(User *user, sqlite3 *db, char *password)
 {
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, "SELECT id, username, password FROM users WHERE username = ?", -1, &stmt, 0) != SQLITE_OK)
     {
+        free(password);
         sqlite3_finalize(stmt);
         return 1;
     }
@@ -91,16 +92,20 @@ int loginUserDB(User *user, sqlite3 *db, const char *password)
         if (usernameDB == NULL || strcmp(usernameDB, user->name) == 1 ||
             passwordDB == NULL || strcmp(passwordDB, password) == 1)
         {
+            free(password);
             sqlite3_finalize(stmt);
             return 1;
         }
         else if (strcmp(usernameDB, user->name) == 0 && strcmp(passwordDB, password) == 0)
         {
             strcpy(user->password, password);
+            free(password);
             sqlite3_finalize(stmt);
             return 0;
         }
     }
+
+    free(password);
     sqlite3_finalize(stmt);
     return 1;
 }
@@ -174,6 +179,7 @@ Account *getAllUserAcc(char *username, sqlite3 *db, int *count)
             if (!accounts)
             {
                 sqlite3_finalize(stmt);
+                free(accounts);
                 return NULL;
             }
         }
@@ -217,8 +223,6 @@ Account *getAccData(char *username, sqlite3 *db, int accNB)
     return NULL;
 }
 
-
-
 int deletAccount(User u, sqlite3 *db, int accNB)
 {
     Account *acc = getAccData(u.name, db, accNB);
@@ -250,8 +254,6 @@ int deletAccount(User u, sqlite3 *db, int accNB)
     return 0;
 }
 
-
-
 int getUserID(sqlite3 *db, char *name)
 {
     sqlite3_stmt *stmt;
@@ -271,4 +273,3 @@ int getUserID(sqlite3 *db, char *name)
     sqlite3_finalize(stmt);
     return userID;
 }
-

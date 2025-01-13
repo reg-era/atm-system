@@ -45,23 +45,29 @@ int registerMenu(User *user, sqlite3 *db)
     return 0;
 }
 
-int loginMenu(User *user, sqlite3 *db) {
+int loginMenu(User *user, sqlite3 *db)
+{
     system("clear");
     printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUsername: ");
     char input[100];
-    
-    if (fgets(input, sizeof(input), stdin)) {
+
+    if (fgets(input, sizeof(input), stdin))
+    {
         input[strcspn(input, "\n")] = 0;
-        if (strlen(input) > 20) {
+        if (strlen(input) > 20)
+        {
             return 1;
         }
         strcpy(user->name, input);
-    } else {
+    }
+    else
+    {
         return 1;
     }
 
     char *password = getpass("\n\n\t\tEnter the password to login: ");
-    if (password == NULL || strlen(password) > 30) {
+    if (password == NULL || strlen(password) > 30)
+    {
         return 1;
     }
 

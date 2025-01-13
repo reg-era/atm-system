@@ -21,4 +21,7 @@ prepare:
 clean:
 	rm -rf bin
 
+test: build
+	valgrind --leak-check=full --show-leak-kinds=all ./bin/atm
+
 all: build run
