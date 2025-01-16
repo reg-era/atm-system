@@ -18,6 +18,7 @@ invalid:
         }
         else if (strcmp(input, "0") == 0)
         {
+            sqlite3_close(db);
             system("clear");
             exit(0);
         }
@@ -59,7 +60,19 @@ int validCountry(char *country)
 {
     for (int i = 0; i < strlen(country); i++)
     {
-        if (!(isalpha(country[i]) || country[i] == '-'))
+        if (!(isalpha(country[i]) || country[i] == ' ' || country[i] == '-'))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validPhone(char *phone)
+{
+    for (int i = 0; i < strlen(phone); i++)
+    {
+        if (!(isdigit(phone[i]) || phone[i] == ' '))
         {
             return 0;
         }

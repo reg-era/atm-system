@@ -113,7 +113,7 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
             if (fgets(phone, sizeof(phone), stdin))
             {
                 phone[strcspn(phone, "\n")] = 0;
-                if (strlen(phone) > 0)
+                if (strlen(phone) > 0 && validPhone(phone))
                 {
                     sqlite3_bind_text(stmt, 1, phone, -1, SQLITE_STATIC);
                     break;
@@ -130,7 +130,7 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
             if (fgets(country, sizeof(country), stdin))
             {
                 country[strcspn(country, "\n")] = 0;
-                if (strlen(country) > 0)
+                if (strlen(country) > 0 && validCountry(country))
                 {
                     sqlite3_bind_text(stmt, 1, country, -1, SQLITE_STATIC);
                     break;

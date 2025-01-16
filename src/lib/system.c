@@ -85,7 +85,7 @@ int createNewAcc(User u, sqlite3 *db)
     if (fgets(input, sizeof(input), stdin))
     {
         input[strcspn(input, "\n")] = 0;
-        if (strlen(input) > 0)
+        if (strlen(input) > 0 && validPhone(input))
         {
             strncpy(acc.phone, input, sizeof(acc.phone) - 1);
             acc.phone[sizeof(acc.phone) - 1] = '\0';
