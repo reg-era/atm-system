@@ -36,21 +36,22 @@ void checkAccount(User u, sqlite3 *db, int accNB)
     {
         printf(
             " --> You will get $%.2f as interest on day %d/%d/%d",
-            (accountData->amount * 0.04), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+1);
+            (accountData->amount * 0.04), accountData->deposit.day, accountData->deposit.month, accountData->deposit.year + 1);
     }
     else if (strcmp(accountData->accountType, "fixed02") == 0)
     {
         printf(
             " --> You will get $%.2f as interest on day %d/%d/%d",
-            (accountData->amount * 0.05 * 2), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+2);
+            (accountData->amount * 0.05 * 2), accountData->deposit.day, accountData->deposit.month, accountData->deposit.year + 2);
     }
     else if (strcmp(accountData->accountType, "fixed03") == 0)
     {
         printf(
             " --> You will get $%.2f as interest on day %d/%d/%d",
-            (accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month,accountData->deposit.year+3);
+            (accountData->amount * 0.08 * 3), accountData->deposit.day, accountData->deposit.month, accountData->deposit.year + 3);
     }
 
+    free(accountData);
     printf("\n✓ Acount information displayed succesfuly\n");
     finish(u, db);
     return;
@@ -98,6 +99,7 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK)
     {
+        free(accData);
         sqlite3_finalize(stmt);
         return;
     }
@@ -146,10 +148,12 @@ void updatUserAcc(int option, User u, sqlite3 *db, int accNB)
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
+        free(accData);
         sqlite3_finalize(stmt);
         return;
     }
 
+    free(accData);
     sqlite3_finalize(stmt);
     printf("\n✓ Account %s updated succesfuly\n", (option == 1) ? "phone number" : "country name");
     finish(u, db);

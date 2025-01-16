@@ -54,3 +54,15 @@ int validDate(int day, int month, int year)
     }
     return 1;
 }
+
+int validCountry(char *country)
+{
+    for (int i = 0; i < strlen(country); i++)
+    {
+        if (!(isalpha(country[i]) || country[i] == '-'))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}

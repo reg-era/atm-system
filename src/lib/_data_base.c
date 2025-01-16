@@ -210,16 +210,28 @@ Account *getAccData(char *username, sqlite3 *db, int accNB)
     Account *allacount = getAllUserAcc(username, db, &count);
 
     if (count == 0)
+    {
         return NULL;
+    }
 
     for (int i = 0; i < count; i++)
     {
         if (allacount[i].accountNbr == accNB)
         {
-            return &allacount[i];
+            Account *res = (Account *)malloc(sizeof(Account));
+            if (res == NULL)
+            {
+                free(allacount);
+                return NULL;
+            }
+            *res = allacount[i];
+
+            free(allacount);
+            return res;
         }
     }
 
+    free(allacount);
     return NULL;
 }
 
@@ -237,6 +249,7 @@ int deletAccount(User u, sqlite3 *db, int accNB)
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK)
     {
+        free(acc);
         return 1;
     }
 
@@ -246,10 +259,12 @@ int deletAccount(User u, sqlite3 *db, int accNB)
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
         fprintf(stderr, "Failed to delete account: %s\n", sqlite3_errmsg(db));
+        free(acc);
         sqlite3_finalize(stmt);
         return 1;
     }
 
+    free(acc);
     sqlite3_finalize(stmt);
     return 0;
 }

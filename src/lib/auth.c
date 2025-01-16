@@ -12,10 +12,10 @@ int registerMenu(User *user, sqlite3 *db)
         return 1;
     }
     nameInput[strcspn(nameInput, "\n")] = 0;
-    if (strlen(nameInput) > 20)
+    if (strlen(nameInput) > 20 || strlen(nameInput) == 0)
     {
         system("clear");
-        printf("✖ Username exceeds 20 characters!\n");
+        printf("✖ Invalid username\n");
         return 1;
     }
     strcpy(user->name, nameInput);
@@ -29,10 +29,10 @@ int registerMenu(User *user, sqlite3 *db)
         return 1;
     }
     passwordInput[strcspn(passwordInput, "\n")] = 0;
-    if (strlen(passwordInput) > 30)
+    if (strlen(passwordInput) > 30 && strlen(passwordInput) == 0)
     {
         system("clear");
-        printf("✖ Password exceeds 30 characters!\n");
+        printf("✖ Invalid password\n");
         return 1;
     }
     strcpy(user->password, passwordInput);

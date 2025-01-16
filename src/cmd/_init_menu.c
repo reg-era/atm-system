@@ -35,8 +35,10 @@ int mainMenu(User user, sqlite3 *db)
                 {
                     accInput[strcspn(accInput, "\n")] = 0;
                     int accNB = atoi(accInput);
-                    if (accNB > 0 && getAccData(user.name, db, accNB) != NULL)
+                    Account *accTest = getAccData(user.name, db, accNB);
+                    if (accNB > 0 && accTest != NULL)
                     {
+                        free(accTest);
                         printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
                         char upInput[10];
                         if (fgets(upInput, sizeof(upInput), stdin))
@@ -92,8 +94,10 @@ int mainMenu(User user, sqlite3 *db)
                 {
                     accInput[strcspn(accInput, "\n")] = 0;
                     int accNB = atoi(accInput);
-                    if (accNB > 0 && getAccData(user.name, db, accNB) != NULL)
+                    Account *accTest = getAccData(user.name, db, accNB);
+                    if (accNB > 0 && accTest != NULL)
                     {
+                        free(accTest);
                         printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
                         char transInput[10];
                         if (fgets(transInput, sizeof(transInput), stdin))
@@ -155,6 +159,7 @@ int mainMenu(User user, sqlite3 *db)
                                         userAccount->phone,
                                         userAccount->amount,
                                         userAccount->accountType);
+                                    free(userAccount);
                                     finish(user, db);
                                 }
                             }
@@ -170,6 +175,7 @@ int mainMenu(User user, sqlite3 *db)
                         system("clear");
                         printf("✖ Error invalid account number!\n");
                     }
+                    free(userAccount);
                 }
             }
             else if (strcmp(input, "7") == 0)
@@ -185,6 +191,7 @@ int mainMenu(User user, sqlite3 *db)
                     {
                         if (transferAccount(user, db, userAccount))
                         {
+                            free(userAccount);
                             continue;
                         }
                         else
@@ -201,6 +208,7 @@ int mainMenu(User user, sqlite3 *db)
                                 userAccount->phone,
                                 userAccount->amount,
                                 userAccount->accountType);
+                            free(userAccount);
                             finish(user, db);
                         }
                     }
@@ -209,6 +217,7 @@ int mainMenu(User user, sqlite3 *db)
                         system("clear");
                         printf("✖ Error invalid account number!\n");
                     }
+                    free(userAccount);
                 }
             }
             else if (strcmp(input, "8") == 0)

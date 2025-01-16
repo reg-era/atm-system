@@ -34,12 +34,15 @@ int createNewAcc(User u, sqlite3 *db)
         acc.accountNbr = strtol(input, &endptr, 10);
         if (*endptr == '\0' && acc.accountNbr > 0)
         {
-            if (getAccData(u.name, db, acc.accountNbr) != NULL)
+            Account *accTest = getAccData(u.name, db, acc.accountNbr);
+            if (accTest != NULL)
             {
+                free(accTest);
                 system("clear");
                 printf("✖ Account number exists");
                 return 0;
             }
+            free(accTest);
         }
         else
         {
@@ -59,7 +62,7 @@ int createNewAcc(User u, sqlite3 *db)
     if (fgets(input, sizeof(input), stdin))
     {
         input[strcspn(input, "\n")] = 0;
-        if (strlen(input) > 0)
+        if (strlen(input) > 0 && validCountry(input))
         {
             strncpy(acc.country, input, sizeof(acc.country) - 1);
             acc.country[sizeof(acc.country) - 1] = '\0';
@@ -167,6 +170,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
 
     if (!strcmp(accData->accountType, "fixed01") || !strcmp(accData->accountType, "fixed02") || !strcmp(accData->accountType, "fixed03"))
     {
+        free(accData);
         printf("You cannot %s cash in fixed accounts!\n", option == 1 ? "withdraw" : "deposit");
         return;
     }
@@ -174,6 +178,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, "UPDATE accounts SET balance = ? WHERE id = ? ;", -1, &stmt, 0) != SQLITE_OK)
     {
+        free(accData);
         sqlite3_finalize(stmt);
         return;
     }
@@ -190,6 +195,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
         if (newAmount <= 0)
         {
             printf("✖ Invalid amount! Please enter a valid positive number.\n");
+            free(accData);
             sqlite3_finalize(stmt);
             return;
         }
@@ -199,6 +205,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
             if (newAmount > accData->amount)
             {
                 printf("✖ The amount you chose to withdraw is greater than your available balance!\n");
+                free(accData);
                 sqlite3_finalize(stmt);
                 return;
             }
@@ -213,6 +220,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
     else
     {
         printf("✖ Invalid input data.\n");
+        free(accData);
         sqlite3_finalize(stmt);
         return;
     }
@@ -221,10 +229,12 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
+        free(accData);
         sqlite3_finalize(stmt);
         return;
     }
 
+    free(accData);
     sqlite3_finalize(stmt);
     printf("\n✓ Transaction %s processed successfully\n", option == 1 ? "withdraw" : "deposit");
     finish(u, db);

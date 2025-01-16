@@ -39,7 +39,7 @@ int initMenu(User *user, sqlite3 *db)
             {
                 system("clear");
                 sqlite3_close(db);
-                exit(0);
+                return 1;
             }
         }
         system("clear");

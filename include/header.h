@@ -36,5 +36,7 @@ int transferAccount(User u, sqlite3 *db, Account *accData);
 // utility functions
 void finish(User u, sqlite3 *db);
 int validDate(int month, int day, int year);
+int validCountry(char *country);
+void handleSignal(int signal);
 
 #endif

@@ -9,17 +9,10 @@ int main()
 
     if (initMenu(&user, db))
     {
-        system("clear");
-        printf("error on registation system\n");
-        exit(1);
+        return 0;
     }
 
-    if (mainMenu(user, db))
-    {
-        system("clear");
-        printf("error on interface system\n");
-        exit(1);
-    }
+    mainMenu(user, db);
 
     return 0;
 }
