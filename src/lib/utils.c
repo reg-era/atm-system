@@ -89,3 +89,28 @@ int validPhone(char *phone)
     }
     return 1;
 }
+
+void getPassword(char *buffer, const char *prompt)
+{
+    struct termios oldt, newt;
+
+    printf("%s", prompt);
+    fflush(stdout);
+
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+    {
+        buffer[0] = '\0';
+    }
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+    if (strlen(buffer) > 0 && buffer[strlen(buffer) - 1] == '\n')
+    {
+        buffer[strlen(buffer) - 1] = '\0';
+    }
+}

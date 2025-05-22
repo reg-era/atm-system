@@ -23,6 +23,7 @@ int getUserID(sqlite3 *db, char *name);
 void checkAccount(User u, sqlite3 *db, int accNB);
 void checkAllAccounts(User u, sqlite3 *db);
 void updatUserAcc(int option, User u, sqlite3 *db, int accNB);
+void getPassword(char *buffer, const char *prompt);
 
 // authentication functions
 int loginMenu(User *user, sqlite3 *db);

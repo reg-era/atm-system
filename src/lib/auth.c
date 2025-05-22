@@ -65,11 +65,16 @@ int loginMenu(User *user, sqlite3 *db)
         return 1;
     }
 
-    char *password = getpass("\n\n\t\tEnter the password to login: ");
-    if (password == NULL || strlen(password) > 30)
-    {
-        return 1;
-    }
+    char password[32]; 
+    getPassword(password, "\n\n\t\tEnter the password to login: ");
 
-    return loginUserDB(user, db, password);
+    // char *password = getpass("\n\n\t\tEnter the password to login: ");
+    // if (password == NULL || strlen(password) > 30)
+    // {
+    //     return 1;
+    // }
+
+    int valid = loginUserDB(user, db, password);
+
+    return valid;
 }

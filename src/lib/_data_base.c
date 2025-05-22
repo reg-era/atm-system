@@ -77,7 +77,6 @@ int loginUserDB(User *user, sqlite3 *db, char *password)
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, "SELECT id, username, password FROM users WHERE username = ?", -1, &stmt, 0) != SQLITE_OK)
     {
-        free(password);
         sqlite3_finalize(stmt);
         return 1;
     }
@@ -93,20 +92,17 @@ int loginUserDB(User *user, sqlite3 *db, char *password)
         if (usernameDB == NULL || strcmp(usernameDB, user->name) == 1 ||
             passwordDB == NULL || strcmp(passwordDB, password) == 1)
         {
-            free(password);
             sqlite3_finalize(stmt);
             return 1;
         }
         else if (strcmp(usernameDB, user->name) == 0 && strcmp(passwordDB, password) == 0)
         {
             strcpy(user->password, password);
-            free(password);
             sqlite3_finalize(stmt);
             return 0;
         }
     }
 
-    free(password);
     sqlite3_finalize(stmt);
     return 1;
 }
@@ -162,7 +158,7 @@ Account *getAllUserAcc(char *username, sqlite3 *db, int *count)
     }
     sqlite3_bind_text(stmt, 1, username, -1, SQLITE_STATIC);
 
-    int capacity = 3;
+    int capacity = 1;
 
     accounts = malloc(capacity * sizeof(Account));
     if (!accounts)
@@ -175,7 +171,7 @@ Account *getAllUserAcc(char *username, sqlite3 *db, int *count)
     {
         if (i == capacity)
         {
-            capacity *= 2;
+            capacity += 1;
             accounts = realloc(accounts, capacity * sizeof(Account));
             if (!accounts)
             {
