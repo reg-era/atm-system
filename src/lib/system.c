@@ -8,10 +8,11 @@ int createNewAcc(User u, sqlite3 *db)
     char input[100];
 
     printf("\nEnter today's date (dd/mm/yyyy): ");
+
     if (fgets(input, sizeof(input), stdin))
     {
         if (sscanf(input, "%d/%d/%d", &acc.deposit.day, &acc.deposit.month, &acc.deposit.year) != 3 ||
-            !validDate(acc.deposit.day, acc.deposit.month, acc.deposit.year))
+            !validDate(acc.deposit.day, acc.deposit.month, acc.deposit.year, strlen(input)))
         {
             system("clear");
             printf("✖ Invalid date");
@@ -107,6 +108,12 @@ int createNewAcc(User u, sqlite3 *db)
     printf("\nEnter amount to deposit: $");
     if (fgets(input, sizeof(input), stdin))
     {
+        if ((strstr(input, ".") && strlen(input) > 14) || (!strstr(input, ".") && strlen(input) > 11))
+        {
+            system("clear");
+            printf("✖ Maximume amount of transaction is 9999999999.99\nand make sure to use the form .99");
+            return 0;
+        }
         input[strcspn(input, "\n")] = 0;
 
         char *endptr;
@@ -190,13 +197,21 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
     if (fgets(input, sizeof(input), stdin))
     {
         input[strcspn(input, "\n")] = 0;
+        if ((strstr(input, ".") && strlen(input) > 13) || (!strstr(input, ".") && strlen(input) > 10))
+        {
+            free(accData);
+            sqlite3_finalize(stmt);
+            system("clear");
+            printf("✖ Maximume amount of transaction is 9999999999.99\nand make sure to use the form .99");
+            return;
+        }
         newAmount = strtod(input, NULL);
 
         if (newAmount <= 0)
         {
-            printf("✖ Invalid amount! Please enter a valid positive number.\n");
             free(accData);
             sqlite3_finalize(stmt);
+            printf("✖ Invalid amount! Please enter a valid positive number.\n");
             return;
         }
 
@@ -204,9 +219,9 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
         {
             if (newAmount > accData->amount)
             {
-                printf("✖ The amount you chose to withdraw is greater than your available balance!\n");
                 free(accData);
                 sqlite3_finalize(stmt);
+                printf("✖ The amount you chose to withdraw is greater than your available balance!\n");
                 return;
             }
 

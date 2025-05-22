@@ -30,7 +30,7 @@ invalid:
     }
 }
 
-int validDate(int day, int month, int year)
+int validDate(int day, int month, int year, int inputLen)
 {
     if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1900 || year > 2100)
     {
@@ -53,6 +53,16 @@ int validDate(int day, int month, int year)
                 return 0;
         }
     }
+
+    int finalLen = 7;
+    finalLen += (day >= 10) ? 2 : 1;
+    finalLen += (month >= 10) ? 2 : 1;
+
+    if (inputLen != finalLen)
+    {
+        return 0;
+    }
+
     return 1;
 }
 

@@ -5,6 +5,7 @@ const char *_create_tables =
     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
     "username TEXT NOT NULL UNIQUE, "
     "password TEXT NOT NULL); "
+
     "CREATE TABLE IF NOT EXISTS accounts ("
     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
     "created_at TEXT NOT NULL, "
