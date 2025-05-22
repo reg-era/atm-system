@@ -4,7 +4,7 @@ int registerMenu(User *user, sqlite3 *db)
 {
     system("clear");
     printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUser Login (20 character max): ");
-    char nameInput[100];
+    char nameInput[64];
     if (!fgets(nameInput, sizeof(nameInput), stdin))
     {
         system("clear");
@@ -21,7 +21,7 @@ int registerMenu(User *user, sqlite3 *db)
     strcpy(user->name, nameInput);
 
     printf("\n\n\t\tEnter the password to login (30 character max): ");
-    char passwordInput[100];
+    char passwordInput[64];
     if (!fgets(passwordInput, sizeof(passwordInput), stdin))
     {
         system("clear");
@@ -49,7 +49,7 @@ int loginMenu(User *user, sqlite3 *db)
 {
     system("clear");
     printf("\n\n\t\t======= Bank Management System =======\n\n\n\t\tUsername: ");
-    char input[100];
+    char input[64];
 
     if (fgets(input, sizeof(input), stdin))
     {

@@ -5,7 +5,7 @@ int createNewAcc(User u, sqlite3 *db)
     system("clear");
     printf("\t\t\t===== New record =====\n");
     Account acc;
-    char input[100];
+    char input[64];
 
     printf("\nEnter today's date (dd/mm/yyyy): ");
 
@@ -190,7 +190,7 @@ void makeTransaction(int option, User u, sqlite3 *db, int accNB)
         return;
     }
 
-    char input[100];
+    char input[64];
     double newAmount;
 
     printf("Enter the amount to %s: $", option == 1 ? "withdraw" : "deposit");
@@ -259,7 +259,7 @@ int transferAccount(User u, sqlite3 *db, Account *accData)
 {
     system("clear");
     printf("Which user do you want to transfer ownership to (user name): ");
-    char name[50];
+    char name[64];
 
     if (fgets(name, sizeof(name), stdin))
     {

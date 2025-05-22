@@ -5,7 +5,7 @@ int mainMenu(User user, sqlite3 *db)
     system("clear");
     while (1)
     {
-        char input[10];
+        char input[24];
         printf(
             "\n\n\t\t======= ATM ======="
             "\n\n\n\t\t-->> Choose an option:"
@@ -29,7 +29,7 @@ int mainMenu(User user, sqlite3 *db)
             }
             else if (strcmp(input, "2") == 0)
             {
-                char accInput[10];
+                char accInput[12];
                 printf("Enter the account number to update: ");
                 if (fgets(accInput, sizeof(accInput), stdin))
                 {
@@ -40,7 +40,7 @@ int mainMenu(User user, sqlite3 *db)
                     {
                         free(accTest);
                         printf("Choose information to update:\n1 --> Phone\n2 --> Country\n");
-                        char upInput[10];
+                        char upInput[12];
                         if (fgets(upInput, sizeof(upInput), stdin))
                         {
                             upInput[strcspn(upInput, "\n")] = 0;
@@ -65,7 +65,7 @@ int mainMenu(User user, sqlite3 *db)
             }
             else if (strcmp(input, "3") == 0)
             {
-                char accInput[10];
+                char accInput[12];
                 printf("Enter account number: ");
                 if (fgets(accInput, sizeof(accInput), stdin))
                 {
@@ -88,7 +88,7 @@ int mainMenu(User user, sqlite3 *db)
             }
             else if (strcmp(input, "5") == 0)
             {
-                char accInput[10];
+                char accInput[12];
                 printf("Enter account number: ");
                 if (fgets(accInput, sizeof(accInput), stdin))
                 {
@@ -99,7 +99,7 @@ int mainMenu(User user, sqlite3 *db)
                     {
                         free(accTest);
                         printf("Choose transaction:\n1 --> Withdraw\n2 --> Deposit\n");
-                        char transInput[10];
+                        char transInput[12];
                         if (fgets(transInput, sizeof(transInput), stdin))
                         {
                             transInput[strcspn(transInput, "\n")] = 0;
@@ -124,7 +124,7 @@ int mainMenu(User user, sqlite3 *db)
             }
             else if (strcmp(input, "6") == 0)
             {
-                char accInput[10];
+                char accInput[12];
                 printf("Enter account number: ");
                 if (fgets(accInput, sizeof(accInput), stdin))
                 {
@@ -133,7 +133,7 @@ int mainMenu(User user, sqlite3 *db)
                     Account *userAccount = getAccData(user.name, db, accNB);
                     if (accNB > 0 && userAccount != NULL)
                     {
-                        char decision[10];
+                        char decision[12];
                         printf("Confirm deletion (yes): ");
                         if (fgets(decision, sizeof(decision), stdin))
                         {
@@ -180,7 +180,7 @@ int mainMenu(User user, sqlite3 *db)
             }
             else if (strcmp(input, "7") == 0)
             {
-                char accInput[10];
+                char accInput[12];
                 printf("Enter account number to transfer ownership: ");
                 if (fgets(accInput, sizeof(accInput), stdin))
                 {

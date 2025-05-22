@@ -19,9 +19,9 @@ typedef struct
 {
     int id;
     int userId;
-    char country[50];
-    char phone[50];
-    char accountType[10];
+    char country[64];
+    char phone[64];
+    char accountType[24];
     int accountNbr;
     double amount;
     Date deposit;
@@ -30,8 +30,8 @@ typedef struct
 typedef struct
 {
     int id;
-    char name[50];
-    char password[50];
+    char name[64];
+    char password[64];
 } User;
 
 #endif

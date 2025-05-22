@@ -121,7 +121,7 @@ int addAccountDB(int userID, Account *acc, sqlite3 *db)
         return 0;
     }
 
-    char created_at[11];
+    char created_at[24];
     snprintf(created_at, sizeof(created_at), "%02d/%02d/%04d", acc->deposit.day, acc->deposit.month, acc->deposit.year);
 
     sqlite3_bind_text(stmt, 1, created_at, -1, SQLITE_STATIC);
